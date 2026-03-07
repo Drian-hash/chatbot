@@ -44,21 +44,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('ikasandi')->name('ikasandi.')->group(function () {
 
             //kategori
-            Route::resource('kategori',IkasandiKategoriController ::class)->names('kategori');
+            Route::resource('kategori', IkasandiKategoriController::class)->names('kategori');
 
             //identifikasi
             Route::resource('identifikasi', IdentifikasiController::class)->names('identifikasi');
             Route::post('identifikasi/import', [IdentifikasiController::class, 'import'])->name('identifikasi.import');
             Route::post('identifikasi/update-nilai', [IdentifikasiController::class, 'updateNilai'])->name('identifikasi.updateNilai');
             Route::post('identifikasi/upload-bukti', [IdentifikasiController::class, 'uploadBukti'])->name('identifikasi.uploadBukti');
-
+            Route::delete(
+                'identifikasi/hapus-bukti/{id}',
+                [IdentifikasiController::class, 'hapusBukti']
+            )->name('identifikasi.hapusbukti');
         });
 
         //Berita berklarifikasi
         Route::resource('berita', BeritaController::class)->names('berita');
         Route::get('berita/export/excel', [BeritaController::class, 'exportExcel'])->name('berita.export.excel');
-
     });
-
 });
-

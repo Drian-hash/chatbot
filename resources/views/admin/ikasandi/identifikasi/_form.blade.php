@@ -70,15 +70,20 @@
     <!-- KATEGORI -->
     <div class="col-md-6 form-group">
         <label>Kategori <span class="text-danger">*</span></label>
+
         <select name="kategori_id"
                 class="form-control shadow-sm"
                 required>
 
             @foreach($kategoriList as $k)
+
                 <option value="{{ $k->id }}"
                     {{ old('kategori_id', $edit ? $item->kategori_id : '') == $k->id ? 'selected' : '' }}>
+
                     {{ $k->kode_kategori }}
+
                 </option>
+
             @endforeach
 
         </select>
@@ -86,130 +91,188 @@
 
     <!-- KODE SOAL -->
     <div class="col-md-6 form-group">
+
         <label>Kode Soal <span class="text-danger">*</span></label>
+
         <input type="text"
                name="kode_soal"
                class="form-control shadow-sm"
                value="{{ old('kode_soal', $edit ? $item->kode_soal : '') }}"
                required>
+
     </div>
 
     <!-- PERTANYAAN -->
     <div class="col-md-12 form-group">
+
         <label>Pertanyaan <span class="text-danger">*</span></label>
+
         <textarea name="pertanyaan"
                   class="form-control shadow-sm"
                   required>{{ old('pertanyaan', $edit ? $item->pertanyaan : '') }}</textarea>
+
     </div>
 
-    <!-- NILAI DROPDOWN 0-5 -->
+    <!-- NILAI -->
     <div class="col-md-6 form-group">
+
         <label>Nilai <span class="text-danger">*</span></label>
+
         <select name="nilai"
                 class="form-control shadow-sm"
+                id="nilaiSelect{{ $item->id }}"
                 required>
 
-            @for($i=0; $i<=5; $i++)
+            @for($i=0;$i<=5;$i++)
+
                 <option value="{{ $i }}"
                     {{ old('nilai', $edit ? $item->nilai : 0) == $i ? 'selected' : '' }}>
+
                     {{ $i }}
+
                 </option>
+
             @endfor
 
         </select>
+
     </div>
 
-    <!-- KETERANGAN NILAI OTOMATIS -->
+    <!-- KETERANGAN NILAI -->
     <div class="col-md-6 form-group">
+
         <label>Keterangan Indeks</label>
+
         <input type="text"
-               id="keteranganNilai"
+               id="keteranganNilai{{ $item->id }}"
                class="form-control shadow-sm"
                readonly>
+
     </div>
 
     <!-- UPLOAD BUKTI -->
     <div class="col-md-12 form-group">
+
         <label>Upload Bukti Dukung (PDF / JPG / PNG)</label>
 
-        <div class="upload-box" onclick="document.getElementById('buktiInput').click()">
+        <div class="upload-box"
+             id="uploadBox{{ $item->id }}"
+             onclick="document.getElementById('buktiInput{{ $item->id }}').click()">
+
             <i class="fas fa-cloud-upload-alt"></i>
+
             <div class="upload-text">
                 Klik atau tarik file ke sini
             </div>
-            <div id="fileName" class="file-name"></div>
+
+            <div id="fileName{{ $item->id }}" class="file-name"></div>
+
         </div>
 
         <input type="file"
-               id="buktiInput"
+               id="buktiInput{{ $item->id }}"
                name="bukti_dukung"
                accept=".pdf,.jpg,.jpeg,.png"
                hidden>
 
         @if($edit && $item->bukti_dukung)
+
             <small class="d-block mt-2">
+
                 File saat ini:
+
                 <a href="{{ asset('storage/'.$item->bukti_dukung) }}"
                    target="_blank"
                    class="text-primary font-weight-bold">
-                   Lihat File
+
+                    Lihat File
+
                 </a>
+
             </small>
+
         @endif
+
     </div>
 
 </div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    const nilaiSelect = document.querySelector('select[name="nilai"]');
-    const keteranganInput = document.getElementById("keteranganNilai");
+    const nilaiSelect = document.getElementById("nilaiSelect{{ $item->id }}");
+    const keteranganInput = document.getElementById("keteranganNilai{{ $item->id }}");
 
     const keteranganMap = {
+
         0: "Belum ada penerapan kontrol",
         1: "Masih tahap perencanaan",
         2: "Sudah dirancang tapi belum lengkap",
         3: "Sudah diterapkan sebagian",
         4: "Sudah diterapkan konsisten",
         5: "Sudah optimal & dilakukan evaluasi"
+
     };
 
-    function updateKeterangan() {
+    function updateKeterangan(){
+
         keteranganInput.value = keteranganMap[nilaiSelect.value] || "";
+
     }
 
     nilaiSelect.addEventListener("change", updateKeterangan);
+
     updateKeterangan();
 
-    const uploadBox = document.querySelector(".upload-box");
-    const fileInput = document.getElementById("buktiInput");
-    const fileName = document.getElementById("fileName");
+
+    const uploadBox = document.getElementById("uploadBox{{ $item->id }}");
+    const fileInput = document.getElementById("buktiInput{{ $item->id }}");
+    const fileName = document.getElementById("fileName{{ $item->id }}");
+
 
     uploadBox.addEventListener("dragover", function(e){
+
         e.preventDefault();
+
         uploadBox.style.borderColor = "#5dd5f9";
         uploadBox.style.background = "#eef9ff";
+
     });
+
 
     uploadBox.addEventListener("dragleave", function(){
+
         uploadBox.style.borderColor = "#b8c2cc";
         uploadBox.style.background = "#f8fafc";
+
     });
 
+
     uploadBox.addEventListener("drop", function(e){
+
         e.preventDefault();
+
         fileInput.files = e.dataTransfer.files;
+
         showFileName();
+
     });
+
 
     fileInput.addEventListener("change", showFileName);
 
+
     function showFileName(){
+
         if(fileInput.files.length > 0){
+
             fileName.innerText = "File dipilih: " + fileInput.files[0].name;
+
         }
+
     }
 
 });
+
 </script>

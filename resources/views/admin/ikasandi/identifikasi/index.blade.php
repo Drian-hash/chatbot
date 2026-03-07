@@ -3,42 +3,160 @@
 @section('admin')
 
     <style>
+        /* ==============================
+    TABLE
+    ============================== */
+
         .table {
-            font-size: 14px;
+            font-size: 13px;
+            min-width: 950px;
+            /* penting agar bisa scroll horizontal */
         }
 
         .table th {
             font-weight: 600;
+            font-size: 13px;
+            padding: 8px 10px;
         }
 
         .table td {
             vertical-align: middle !important;
+            padding: 6px 8px;
         }
 
+        /* kolom pertanyaan boleh wrap */
         .table td:nth-child(3) {
             white-space: normal;
         }
 
+
+        /* ==============================
+    RESPONSIVE TABLE
+    ============================== */
+
         .table-responsive {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
+
+        /* ==============================
+    SELECT NILAI
+    ============================== */
+
         .nilai-select {
-            width: 55px;
-            height: 30px;
+            width: 50px;
+            height: 28px;
             padding: 2px 4px;
-            font-size: 14px;
+            font-size: 13px;
             text-align: center;
             margin: auto;
         }
 
+
+        /* ==============================
+    FILTER
+    ============================== */
+
         .filter-select {
             width: auto !important;
-            min-width: 70px;
-            max-width: 90px;
-            font-size: 14px;
+            min-width: 65px;
+            max-width: 85px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 3px 8px;
+            padding: 2px 6px;
+        }
+
+
+        /* ==============================
+    INPUT SEARCH
+    ============================== */
+
+        .form-control-sm {
+            font-size: 13px;
+            height: 30px;
+        }
+
+
+        /* ==============================
+    BUTTON
+    ============================== */
+
+        .btn-sm {
+            padding: 3px 7px;
+            font-size: 12.5px;
+        }
+
+
+        /* ==============================
+    MODAL
+    ============================== */
+
+        .modal-title {
+            font-size: 15px;
+        }
+
+        .modal-body {
+            font-size: 13px;
+        }
+
+
+        /* ==============================
+    TOOLBAR
+    ============================== */
+
+        .card-body {
+            padding: 18px 20px;
+        }
+
+
+        /* ==============================
+    INFO KATEGORI
+    ============================== */
+
+        .kategori-info {
+            display: inline-block;
+            background: #f1f3f5;
+            padding: 5px 12px;
+            font-weight: 600;
+            border-left: 4px solid #5dd5f9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+
+        /* ==============================
+    MOBILE
+    ============================== */
+
+        @media (max-width:768px) {
+
+            .table {
+                min-width: 800px;
+                /* tetap lebar agar bisa scroll */
+                font-size: 12.5px;
+            }
+
+            .table th {
+                font-size: 12px;
+                padding: 6px;
+            }
+
+            .table td {
+                padding: 5px;
+            }
+
+            .btn-sm {
+                padding: 3px 6px;
+                font-size: 12px;
+            }
+
+            .nilai-select {
+                width: 45px;
+                height: 26px;
+                font-size: 12px;
+            }
+
         }
     </style>
 
@@ -175,7 +293,7 @@
                                                         <i class="fas fa-upload"></i>
                                                     </button>
                                                 @else
-                                                    <button type="button" class="btn btn-primary btn-sm upload-btn">
+                                                    <button type="button" class="btn btn-success btn-sm upload-btn">
                                                         <i class="fas fa-upload"></i>
                                                     </button>
                                                 @endif
@@ -272,22 +390,62 @@
         @if ($item->bukti_url)
             <div class="modal fade" id="modalPreview{{ $item->id }}">
                 <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
+                    <div class="modal-content shadow">
 
-                        <div class="modal-header bg-secondary text-white">
-                            <h5 class="modal-title">Preview Bukti</h5>
-                            <button type="button" class="close text-white" data-dismiss="modal">
-                                <span>&times;</span>
-                            </button>
+                        <div class="modal-header bg-dark text-white">
+
+                            <h5 class="modal-title">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                Bukti Dukung
+                            </h5>
+
+                            <div class="ml-auto d-flex align-items-center">
+
+                                {{-- DOWNLOAD --}}
+                                <a href="{{ $item->bukti_url }}" download class="btn btn-success btn-sm mr-2"
+                                    data-toggle="tooltip" title="Unduh Bukti">
+
+                                    <i class="fas fa-download"></i>
+                                </a>
+
+                                {{-- HAPUS --}}
+                                <form action="{{ route('admin.ikasandi.identifikasi.hapusbukti', $item->id) }}"
+                                    method="POST" class="delete-bukti-form d-inline">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="button" class="btn btn-danger btn-sm btn-hapus-bukti"
+                                        data-toggle="tooltip" title="Hapus Bukti">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                                <button type="button" class="close text-white ml-3" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+
+                            </div>
+
                         </div>
 
-                        <div class="modal-body p-0" style="height:80vh">
+                        <div class="modal-body p-0" style="height:80vh;background:#f8f9fa">
+
                             @if (in_array($item->bukti_extension, ['jpg', 'jpeg', 'png']))
-                                <img src="{{ $item->bukti_url }}" style="width:100%;height:100%;object-fit:contain">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+
+                                    <img src="{{ $item->bukti_url }}"
+                                        style="max-width:100%;max-height:100%;object-fit:contain">
+
+                                </div>
                             @else
-                                <iframe src="{{ $item->bukti_url }}" width="100%" height="100%"
-                                    style="border:none"></iframe>
+                                <iframe src="{{ $item->bukti_url }}" width="100%" height="100%" style="border:none">
+                                </iframe>
                             @endif
+
                         </div>
 
                     </div>
@@ -300,41 +458,73 @@
         <script>
             document.addEventListener("DOMContentLoaded", function() {
 
-                /* UPDATE NILAI */
+                /* UPDATE NILAI DENGAN KONFIRMASI */
                 document.querySelectorAll(".nilai-select").forEach(select => {
+
                     select.addEventListener("change", function() {
 
                         let id = this.dataset.id
                         let nilai = this.value
+                        let selectElement = this
+                        let oldValue = this.getAttribute("data-old") ?? this.value
 
-                        fetch("{{ route('admin.ikasandi.identifikasi.updateNilai') }}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify({
-                                    id: id,
-                                    nilai: nilai
-                                })
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil',
-                                        text: 'Nilai berhasil diperbarui',
-                                        timer: 1500,
-                                        showConfirmButton: false
+                        Swal.fire({
+                            title: "Ubah Nilai?",
+                            text: "Nilai akan diperbarui di sistem.",
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#6c757d",
+                            confirmButtonText: "Ya, ubah",
+                            cancelButtonText: "Batal"
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+
+                                fetch("{{ route('admin.ikasandi.identifikasi.updateNilai') }}", {
+
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                        },
+                                        body: JSON.stringify({
+                                            id: id,
+                                            nilai: nilai
+                                        })
+
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+
+                                        if (data.success) {
+
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Berhasil',
+                                                text: 'Nilai berhasil diperbarui',
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            })
+
+                                            setTimeout(() => {
+                                                location.reload()
+                                            }, 1200)
+
+                                        }
+
                                     })
 
-                                    setTimeout(() => {
-                                        location.reload()
-                                    }, 1200)
-                                }
-                            })
+                            } else {
+
+                                location.reload()
+
+                            }
+
+                        })
+
                     })
+
                 })
 
                 /* UPLOAD FILE */
@@ -392,6 +582,42 @@
                                 }
                             })
                     })
+                })
+
+                /* AKTIFKAN TOOLTIP */
+                $(function() {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
+
+
+                /* HAPUS BUKTI */
+                document.querySelectorAll(".btn-hapus-bukti").forEach(btn => {
+
+                    btn.addEventListener("click", function() {
+
+                        const form = this.closest("form")
+
+                        Swal.fire({
+
+                            title: "Hapus Bukti?",
+                            text: "File bukti akan dihapus dari sistem.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#6c757d",
+                            confirmButtonText: "Ya, hapus",
+                            cancelButtonText: "Batal"
+
+                        }).then((result) => {
+
+                            if (result.isConfirmed) {
+                                form.submit()
+                            }
+
+                        })
+
+                    })
+
                 })
 
                 /* IMPORT */
