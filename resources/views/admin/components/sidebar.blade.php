@@ -73,7 +73,7 @@
                         </li>
 
                         <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/Gulih') }}" class="sidebar-link">
+                            <a href="{{ url('/admin/ikasandi/gulih') }}" class="sidebar-link">
                                 <span class="hide-menu">Gulih</span>
                             </a>
                         </li>

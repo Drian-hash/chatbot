@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User;
 
 class IkasandiPertanyaan extends Model
 {
@@ -21,6 +20,7 @@ class IkasandiPertanyaan extends Model
         'nilai',
         'bukti_dukung',
         'updated_by',
+        'updated_type'
     ];
 
     protected $casts = [
@@ -28,6 +28,7 @@ class IkasandiPertanyaan extends Model
         'updated_at' => 'datetime',
         'created_at' => 'datetime',
     ];
+
 
     /*
     |--------------------------------------------------------------------------
@@ -40,37 +41,47 @@ class IkasandiPertanyaan extends Model
         return $this->belongsTo(IkasandiKategori::class, 'kategori_id');
     }
 
-    // Mengambil user/admin yang terakhir update
+
+    // User yang update
     public function user()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+
+    // Admin yang update
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'updated_by');
+    }
+
+
     /*
     |--------------------------------------------------------------------------
-    | ACCESSOR (BUKTI DUKUNG)
+    | ACCESSOR BUKTI
     |--------------------------------------------------------------------------
     */
 
-    // URL file bukti dukung
     public function getBuktiUrlAttribute()
     {
-        if ($this->bukti_dukung &&
-            Storage::disk('public')->exists($this->bukti_dukung)) {
-
+        if (
+            $this->bukti_dukung &&
+            Storage::disk('public')->exists($this->bukti_dukung)
+        ) {
             return asset('storage/' . $this->bukti_dukung);
         }
 
         return null;
     }
 
-    // Ekstensi file
+
     public function getBuktiExtensionAttribute()
     {
         return $this->bukti_dukung
             ? strtolower(pathinfo($this->bukti_dukung, PATHINFO_EXTENSION))
             : null;
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -80,9 +91,16 @@ class IkasandiPertanyaan extends Model
 
     public function getUpdatedFormatAttribute()
     {
-        $nama = $this->user->name ?? 'System';
 
-        $nama = $this->admin->name ?? 'System';
+        $nama = 'System';
+
+        if ($this->updated_type === 'admin') {
+            $nama = $this->admin->name ?? 'Admin';
+        }
+
+        if ($this->updated_type === 'user') {
+            $nama = $this->user->name ?? 'User';
+        }
 
         $tanggal = $this->updated_at
             ? $this->updated_at->format('d-m-Y H:i')
@@ -90,6 +108,7 @@ class IkasandiPertanyaan extends Model
 
         return $nama . "\n" . $tanggal;
     }
+
 
     /*
     |--------------------------------------------------------------------------

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
-class IdentifikasiController extends Controller
+class GulihController extends Controller
 {
 
     /*
@@ -48,8 +48,8 @@ class IdentifikasiController extends Controller
 
         $kategoriList = IkasandiKategori::where('is_active', true)
             ->where(function ($q) {
-                $q->where('kode_kategori', '1')
-                    ->orWhere('kode_kategori', 'like', '1.%');
+                $q->where('kode_kategori', '4')
+                    ->orWhere('kode_kategori', 'like', '4.%');
             })
             ->orderByRaw("
                 CAST(SUBSTRING_INDEX(kode_kategori,'.',1) AS UNSIGNED),
@@ -57,7 +57,6 @@ class IdentifikasiController extends Controller
                 CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(kode_kategori,'.',3),'.',-1) AS UNSIGNED)
             ")
             ->get();
-
 
         $kodeKategori = $request->kategori ?? $kategoriList->first()?->kode_kategori;
         $search = $request->search;
@@ -68,14 +67,13 @@ class IdentifikasiController extends Controller
 
         if ($kategori) {
 
-            $soal = IkasandiPertanyaan::identifikasi()
-
+            $soal = IkasandiPertanyaan::gulih()
                 ->where('kategori_id', $kategori->id)
 
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('kode_soal', 'like', "%$search%")
-                            ->orWhere('pertanyaan', 'like', "%$search%");
+                          ->orWhere('pertanyaan', 'like', "%$search%");
                     });
                 })
 
@@ -98,7 +96,7 @@ class IdentifikasiController extends Controller
         }
 
         return view(
-            'admin.ikasandi.identifikasi.index',
+            'admin.ikasandi.gulih.index',
             compact('soal', 'kategoriList', 'kodeKategori', 'kategori', 'search')
         );
     }
@@ -127,10 +125,10 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
+                'ikasandi/gulih',
                 $fileName,
                 'public'
             );
@@ -139,7 +137,7 @@ class IdentifikasiController extends Controller
         $updater = $this->getUpdater();
 
         IkasandiPertanyaan::create([
-            'domain' => 'identifikasi',
+            'domain' => 'gulih',
             'kategori_id' => $request->kategori_id,
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
@@ -159,10 +157,10 @@ class IdentifikasiController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, IkasandiPertanyaan $identifikasi)
+    public function update(Request $request, IkasandiPertanyaan $gulih)
     {
 
-        if ($identifikasi->domain !== 'identifikasi') {
+        if ($gulih->domain !== 'gulih') {
             abort(404);
         }
 
@@ -176,18 +174,18 @@ class IdentifikasiController extends Controller
         if ($request->hasFile('bukti_dukung')) {
 
             if (
-                $identifikasi->bukti_dukung &&
-                Storage::disk('public')->exists($identifikasi->bukti_dukung)
+                $gulih->bukti_dukung &&
+                Storage::disk('public')->exists($gulih->bukti_dukung)
             ) {
-                Storage::disk('public')->delete($identifikasi->bukti_dukung);
+                Storage::disk('public')->delete($gulih->bukti_dukung);
             }
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
-            $identifikasi->bukti_dukung = $file->storeAs(
-                'ikasandi/identifikasi',
+            $gulih->bukti_dukung = $file->storeAs(
+                'ikasandi/gulih',
                 $fileName,
                 'public'
             );
@@ -195,7 +193,7 @@ class IdentifikasiController extends Controller
 
         $updater = $this->getUpdater();
 
-        $identifikasi->update([
+        $gulih->update([
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
             'nilai' => $request->nilai,
@@ -209,143 +207,7 @@ class IdentifikasiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | UPLOAD BUKTI
-    |--------------------------------------------------------------------------
-    */
-
-    public function uploadBukti(Request $request)
-    {
-
-        $request->validate([
-            'id' => 'required|exists:ikasandi_pertanyaan,id',
-            'bukti_dukung' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048'
-        ]);
-
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
-
-        if ($request->hasFile('bukti_dukung')) {
-
-            if (
-                $soal->bukti_dukung &&
-                Storage::disk('public')->exists($soal->bukti_dukung)
-            ) {
-                Storage::disk('public')->delete($soal->bukti_dukung);
-            }
-
-            $file = $request->file('bukti_dukung');
-
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
-
-            $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
-                $fileName,
-                'public'
-            );
-
-            $updater = $this->getUpdater();
-
-            $soal->update([
-                'bukti_dukung' => $filePath,
-                'updated_by' => $updater['id'],
-                'updated_type' => $updater['type']
-            ]);
-        }
-
-        return back()->with('success', 'Bukti dukung berhasil diupload');
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE SOAL
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy(IkasandiPertanyaan $identifikasi)
-    {
-
-        if ($identifikasi->domain !== 'identifikasi') {
-            abort(404);
-        }
-
-        if (
-            $identifikasi->bukti_dukung &&
-            Storage::disk('public')->exists($identifikasi->bukti_dukung)
-        ) {
-            Storage::disk('public')->delete($identifikasi->bukti_dukung);
-        }
-
-        $identifikasi->delete();
-
-        return back()->with('success', 'Soal berhasil dihapus');
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE NILAI REALTIME
-    |--------------------------------------------------------------------------
-    */
-
-    public function updateNilai(Request $request)
-    {
-
-        $request->validate([
-            'id' => 'required|exists:ikasandi_pertanyaan,id',
-            'nilai' => 'required|integer|min:0|max:5'
-        ]);
-
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
-
-        $updater = $this->getUpdater();
-
-        $soal->update([
-            'nilai' => $request->nilai,
-            'updated_by' => $updater['id'],
-            'updated_type' => $updater['type']
-        ]);
-
-        $user = Auth::guard('admin')->check()
-            ? Auth::guard('admin')->user()
-            : Auth::guard('web')->user();
-
-        return response()->json([
-            'success' => true,
-            'user' => $user->name,
-            'tanggal' => now()->format('d-m-Y H:i')
-        ]);
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HAPUS BUKTI
-    |--------------------------------------------------------------------------
-    */
-
-    public function hapusBukti($id)
-    {
-
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($id);
-
-        if (
-            $soal->bukti_dukung &&
-            Storage::disk('public')->exists($soal->bukti_dukung)
-        ) {
-            Storage::disk('public')->delete($soal->bukti_dukung);
-        }
-
-        $soal->update([
-            'bukti_dukung' => null
-        ]);
-
-        return back()->with('success', 'Bukti berhasil dihapus');
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | IMPORT EXCEL
+    | IMPORT EXCEL (DOMAIN 4)
     |--------------------------------------------------------------------------
     */
 
@@ -368,27 +230,47 @@ class IdentifikasiController extends Controller
 
                 if ($index == 0) continue;
 
-                if (empty($row[0]) && empty($row[1]) && empty($row[2])) {
-                    continue;
-                }
+                if (!isset($row[0]) || !isset($row[1]) || !isset($row[2])) continue;
 
-                $kodeKategori = trim($row[0] ?? '');
-                $kodeSoal = trim($row[1] ?? '');
-                $pertanyaan = trim($row[2] ?? '');
-                $nilai = $row[3] ?? 0;
+                $kodeKategori = trim((string)$row[0]);
+                $kodeSoal     = trim((string)$row[1]);
+                $pertanyaan   = trim((string)$row[2]);
+                $nilai        = isset($row[3]) ? (int)$row[3] : 0;
 
-                if (!$kodeKategori || !$kodeSoal || !$pertanyaan) continue;
+                if ($kodeKategori == '' || $kodeSoal == '' || $pertanyaan == '') continue;
+
+                /*
+                FILTER DOMAIN 4
+                */
+
+                $domain = explode('.', $kodeKategori)[0];
+
+                if ($domain != '4') continue;
+
+                /*
+                CARI KATEGORI
+                */
 
                 $kategori = IkasandiKategori::where('kode_kategori', $kodeKategori)->first();
 
                 if (!$kategori) continue;
 
-                $nilai = ($nilai < 0 || $nilai > 5) ? 0 : $nilai;
+                /*
+                VALIDASI NILAI
+                */
+
+                if ($nilai < 0 || $nilai > 5) {
+                    $nilai = 0;
+                }
+
+                /*
+                INSERT / UPDATE
+                */
 
                 IkasandiPertanyaan::updateOrCreate(
 
                     [
-                        'domain' => 'identifikasi',
+                        'domain' => 'gulih',
                         'kode_soal' => $kodeSoal
                     ],
 
@@ -406,14 +288,12 @@ class IdentifikasiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Import berhasil');
+
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                'Import gagal : ' . $e->getMessage()
-            );
+            return back()->with('error', 'Import gagal : ' . $e->getMessage());
         }
     }
 }

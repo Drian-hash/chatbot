@@ -1,5 +1,6 @@
 @php
     $edit = $edit ?? false;
+    $itemId = $edit ? $item->id : 'new';
 @endphp
 
 <style>
@@ -80,6 +81,7 @@
 
     <!-- KATEGORI -->
     <div class="col-md-6 form-group">
+
         <label>Kategori <span class="text-danger">*</span></label>
 
         <select name="kategori_id" class="form-control shadow-sm" required>
@@ -94,9 +96,12 @@
             @endforeach
 
         </select>
+
     </div>
 
+
     <!-- KODE SOAL -->
+
     <div class="col-md-6 form-group">
 
         <label>Kode Soal <span class="text-danger">*</span></label>
@@ -106,7 +111,9 @@
 
     </div>
 
+
     <!-- PERTANYAAN -->
+
     <div class="col-md-12 form-group">
 
         <label>Pertanyaan <span class="text-danger">*</span></label>
@@ -115,12 +122,14 @@
 
     </div>
 
+
     <!-- NILAI -->
+
     <div class="col-md-6 form-group">
 
         <label>Nilai <span class="text-danger">*</span></label>
 
-        <select name="nilai" class="form-control shadow-sm" id="nilaiSelect{{ $item->id }}" required>
+        <select name="nilai" class="form-control shadow-sm" id="nilaiSelect{{ $itemId }}" required>
 
             @for ($i = 0; $i <= 5; $i++)
                 <option value="{{ $i }}"
@@ -135,22 +144,26 @@
 
     </div>
 
+
     <!-- KETERANGAN NILAI -->
+
     <div class="col-md-6 form-group">
 
         <label>Keterangan Indeks</label>
 
-        <input type="text" id="keteranganNilai{{ $item->id }}" class="form-control shadow-sm" readonly>
+        <input type="text" id="keteranganNilai{{ $itemId }}" class="form-control shadow-sm" readonly>
 
     </div>
 
+
     <!-- UPLOAD BUKTI -->
+
     <div class="col-md-12 form-group">
 
         <label>Upload Bukti Dukung (PDF / JPG / PNG)</label>
 
-        <div class="upload-box" id="uploadBox{{ $item->id }}"
-            onclick="document.getElementById('buktiInput{{ $item->id }}').click()">
+        <div class="upload-box" id="uploadBox{{ $itemId }}"
+            onclick="document.getElementById('buktiInput{{ $itemId }}').click()">
 
             <i class="fas fa-cloud-upload-alt"></i>
 
@@ -158,17 +171,17 @@
                 Klik atau tarik file ke sini
             </div>
 
-            <div id="fileName{{ $item->id }}" class="file-name"></div>
+            <div id="fileName{{ $itemId }}" class="file-name"></div>
 
         </div>
 
-        <input type="file" id="buktiInput{{ $item->id }}" name="bukti_dukung" accept=".pdf,.jpg,.jpeg,.png"
+        <input type="file" id="buktiInput{{ $itemId }}" name="bukti_dukung" accept=".pdf,.jpg,.jpeg,.png"
             hidden>
 
         @if ($edit && $item->bukti_dukung)
             <small class="d-block mt-2">
 
-                File saat ini:
+                File saat ini :
 
                 <a href="{{ asset('storage/' . $item->bukti_dukung) }}" target="_blank"
                     class="text-primary font-weight-bold">
@@ -184,11 +197,12 @@
 
 </div>
 
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        const nilaiSelect = document.getElementById("nilaiSelect{{ $item->id }}");
-        const keteranganInput = document.getElementById("keteranganNilai{{ $item->id }}");
+        const nilaiSelect = document.getElementById("nilaiSelect{{ $itemId }}");
+        const keteranganInput = document.getElementById("keteranganNilai{{ $itemId }}");
 
         const keteranganMap = {
 
@@ -202,9 +216,7 @@
         };
 
         function updateKeterangan() {
-
             keteranganInput.value = keteranganMap[nilaiSelect.value] || "";
-
         }
 
         nilaiSelect.addEventListener("change", updateKeterangan);
@@ -212,9 +224,9 @@
         updateKeterangan();
 
 
-        const uploadBox = document.getElementById("uploadBox{{ $item->id }}");
-        const fileInput = document.getElementById("buktiInput{{ $item->id }}");
-        const fileName = document.getElementById("fileName{{ $item->id }}");
+        const uploadBox = document.getElementById("uploadBox{{ $itemId }}");
+        const fileInput = document.getElementById("buktiInput{{ $itemId }}");
+        const fileName = document.getElementById("fileName{{ $itemId }}");
 
 
         uploadBox.addEventListener("dragover", function(e) {
@@ -226,14 +238,12 @@
 
         });
 
-
         uploadBox.addEventListener("dragleave", function() {
 
             uploadBox.style.borderColor = "#b8c2cc";
             uploadBox.style.background = "#f8fafc";
 
         });
-
 
         uploadBox.addEventListener("drop", function(e) {
 
@@ -245,15 +255,13 @@
 
         });
 
-
         fileInput.addEventListener("change", showFileName);
-
 
         function showFileName() {
 
             if (fileInput.files.length > 0) {
 
-                fileName.innerText = "File dipilih: " + fileInput.files[0].name;
+                fileName.innerText = "File dipilih : " + fileInput.files[0].name;
 
             }
 

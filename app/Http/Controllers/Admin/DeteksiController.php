@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
-class IdentifikasiController extends Controller
+class DeteksiController extends Controller
 {
 
     /*
@@ -48,8 +48,8 @@ class IdentifikasiController extends Controller
 
         $kategoriList = IkasandiKategori::where('is_active', true)
             ->where(function ($q) {
-                $q->where('kode_kategori', '1')
-                    ->orWhere('kode_kategori', 'like', '1.%');
+                $q->where('kode_kategori', '3')
+                  ->orWhere('kode_kategori', 'like', '3.%');
             })
             ->orderByRaw("
                 CAST(SUBSTRING_INDEX(kode_kategori,'.',1) AS UNSIGNED),
@@ -57,7 +57,6 @@ class IdentifikasiController extends Controller
                 CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(kode_kategori,'.',3),'.',-1) AS UNSIGNED)
             ")
             ->get();
-
 
         $kodeKategori = $request->kategori ?? $kategoriList->first()?->kode_kategori;
         $search = $request->search;
@@ -68,15 +67,19 @@ class IdentifikasiController extends Controller
 
         if ($kategori) {
 
-            $soal = IkasandiPertanyaan::identifikasi()
+            $soal = IkasandiPertanyaan::deteksi()
 
                 ->where('kategori_id', $kategori->id)
 
                 ->when($search, function ($query) use ($search) {
+
                     $query->where(function ($q) use ($search) {
+
                         $q->where('kode_soal', 'like', "%$search%")
-                            ->orWhere('pertanyaan', 'like', "%$search%");
+                          ->orWhere('pertanyaan', 'like', "%$search%");
+
                     });
+
                 })
 
                 ->orderByRaw("LENGTH(kode_soal), kode_soal")
@@ -94,11 +97,12 @@ class IdentifikasiController extends Controller
                         : null;
 
                     return $item;
+
                 });
         }
 
         return view(
-            'admin.ikasandi.identifikasi.index',
+            'admin.ikasandi.deteksi.index',
             compact('soal', 'kategoriList', 'kodeKategori', 'kategori', 'search')
         );
     }
@@ -127,10 +131,10 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
+                'ikasandi/deteksi',
                 $fileName,
                 'public'
             );
@@ -139,7 +143,7 @@ class IdentifikasiController extends Controller
         $updater = $this->getUpdater();
 
         IkasandiPertanyaan::create([
-            'domain' => 'identifikasi',
+            'domain' => 'deteksi',
             'kategori_id' => $request->kategori_id,
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
@@ -159,10 +163,10 @@ class IdentifikasiController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, IkasandiPertanyaan $identifikasi)
+    public function update(Request $request, IkasandiPertanyaan $deteksi)
     {
 
-        if ($identifikasi->domain !== 'identifikasi') {
+        if ($deteksi->domain !== 'deteksi') {
             abort(404);
         }
 
@@ -176,18 +180,18 @@ class IdentifikasiController extends Controller
         if ($request->hasFile('bukti_dukung')) {
 
             if (
-                $identifikasi->bukti_dukung &&
-                Storage::disk('public')->exists($identifikasi->bukti_dukung)
+                $deteksi->bukti_dukung &&
+                Storage::disk('public')->exists($deteksi->bukti_dukung)
             ) {
-                Storage::disk('public')->delete($identifikasi->bukti_dukung);
+                Storage::disk('public')->delete($deteksi->bukti_dukung);
             }
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
-            $identifikasi->bukti_dukung = $file->storeAs(
-                'ikasandi/identifikasi',
+            $deteksi->bukti_dukung = $file->storeAs(
+                'ikasandi/deteksi',
                 $fileName,
                 'public'
             );
@@ -195,7 +199,7 @@ class IdentifikasiController extends Controller
 
         $updater = $this->getUpdater();
 
-        $identifikasi->update([
+        $deteksi->update([
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
             'nilai' => $request->nilai,
@@ -221,7 +225,7 @@ class IdentifikasiController extends Controller
             'bukti_dukung' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
+        $soal = IkasandiPertanyaan::deteksi()->findOrFail($request->id);
 
         if ($request->hasFile('bukti_dukung')) {
 
@@ -234,10 +238,10 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
+                'ikasandi/deteksi',
                 $fileName,
                 'public'
             );
@@ -257,25 +261,25 @@ class IdentifikasiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DELETE SOAL
+    | DELETE
     |--------------------------------------------------------------------------
     */
 
-    public function destroy(IkasandiPertanyaan $identifikasi)
+    public function destroy(IkasandiPertanyaan $deteksi)
     {
 
-        if ($identifikasi->domain !== 'identifikasi') {
+        if ($deteksi->domain !== 'deteksi') {
             abort(404);
         }
 
         if (
-            $identifikasi->bukti_dukung &&
-            Storage::disk('public')->exists($identifikasi->bukti_dukung)
+            $deteksi->bukti_dukung &&
+            Storage::disk('public')->exists($deteksi->bukti_dukung)
         ) {
-            Storage::disk('public')->delete($identifikasi->bukti_dukung);
+            Storage::disk('public')->delete($deteksi->bukti_dukung);
         }
 
-        $identifikasi->delete();
+        $deteksi->delete();
 
         return back()->with('success', 'Soal berhasil dihapus');
     }
@@ -295,7 +299,7 @@ class IdentifikasiController extends Controller
             'nilai' => 'required|integer|min:0|max:5'
         ]);
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
+        $soal = IkasandiPertanyaan::deteksi()->findOrFail($request->id);
 
         $updater = $this->getUpdater();
 
@@ -326,7 +330,7 @@ class IdentifikasiController extends Controller
     public function hapusBukti($id)
     {
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($id);
+        $soal = IkasandiPertanyaan::deteksi()->findOrFail($id);
 
         if (
             $soal->bukti_dukung &&
@@ -368,9 +372,7 @@ class IdentifikasiController extends Controller
 
                 if ($index == 0) continue;
 
-                if (empty($row[0]) && empty($row[1]) && empty($row[2])) {
-                    continue;
-                }
+                if (empty($row[0]) && empty($row[1]) && empty($row[2])) continue;
 
                 $kodeKategori = trim($row[0] ?? '');
                 $kodeSoal = trim($row[1] ?? '');
@@ -378,6 +380,12 @@ class IdentifikasiController extends Controller
                 $nilai = $row[3] ?? 0;
 
                 if (!$kodeKategori || !$kodeSoal || !$pertanyaan) continue;
+
+                /* FILTER DOMAIN 3 */
+
+                if (!Str::startsWith($kodeKategori, '3')) {
+                    continue;
+                }
 
                 $kategori = IkasandiKategori::where('kode_kategori', $kodeKategori)->first();
 
@@ -388,7 +396,7 @@ class IdentifikasiController extends Controller
                 IkasandiPertanyaan::updateOrCreate(
 
                     [
-                        'domain' => 'identifikasi',
+                        'domain' => 'deteksi',
                         'kode_soal' => $kodeSoal
                     ],
 
@@ -406,14 +414,13 @@ class IdentifikasiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Import berhasil');
+
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                'Import gagal : ' . $e->getMessage()
-            );
+            return back()->with('error', 'Import gagal : '.$e->getMessage());
+
         }
     }
 }

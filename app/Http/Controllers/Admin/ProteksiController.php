@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
-class IdentifikasiController extends Controller
+class ProteksiController extends Controller
 {
 
     /*
@@ -48,8 +48,8 @@ class IdentifikasiController extends Controller
 
         $kategoriList = IkasandiKategori::where('is_active', true)
             ->where(function ($q) {
-                $q->where('kode_kategori', '1')
-                    ->orWhere('kode_kategori', 'like', '1.%');
+                $q->where('kode_kategori', '2')
+                  ->orWhere('kode_kategori', 'like', '2.%');
             })
             ->orderByRaw("
                 CAST(SUBSTRING_INDEX(kode_kategori,'.',1) AS UNSIGNED),
@@ -57,7 +57,6 @@ class IdentifikasiController extends Controller
                 CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(kode_kategori,'.',3),'.',-1) AS UNSIGNED)
             ")
             ->get();
-
 
         $kodeKategori = $request->kategori ?? $kategoriList->first()?->kode_kategori;
         $search = $request->search;
@@ -68,14 +67,14 @@ class IdentifikasiController extends Controller
 
         if ($kategori) {
 
-            $soal = IkasandiPertanyaan::identifikasi()
+            $soal = IkasandiPertanyaan::proteksi()
 
                 ->where('kategori_id', $kategori->id)
 
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('kode_soal', 'like', "%$search%")
-                            ->orWhere('pertanyaan', 'like', "%$search%");
+                          ->orWhere('pertanyaan', 'like', "%$search%");
                     });
                 })
 
@@ -98,7 +97,7 @@ class IdentifikasiController extends Controller
         }
 
         return view(
-            'admin.ikasandi.identifikasi.index',
+            'admin.ikasandi.proteksi.index',
             compact('soal', 'kategoriList', 'kodeKategori', 'kategori', 'search')
         );
     }
@@ -130,7 +129,7 @@ class IdentifikasiController extends Controller
             $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
+                'ikasandi/proteksi',
                 $fileName,
                 'public'
             );
@@ -139,7 +138,7 @@ class IdentifikasiController extends Controller
         $updater = $this->getUpdater();
 
         IkasandiPertanyaan::create([
-            'domain' => 'identifikasi',
+            'domain' => 'proteksi',
             'kategori_id' => $request->kategori_id,
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
@@ -159,10 +158,10 @@ class IdentifikasiController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, IkasandiPertanyaan $identifikasi)
+    public function update(Request $request, IkasandiPertanyaan $proteksi)
     {
 
-        if ($identifikasi->domain !== 'identifikasi') {
+        if ($proteksi->domain !== 'proteksi') {
             abort(404);
         }
 
@@ -176,18 +175,18 @@ class IdentifikasiController extends Controller
         if ($request->hasFile('bukti_dukung')) {
 
             if (
-                $identifikasi->bukti_dukung &&
-                Storage::disk('public')->exists($identifikasi->bukti_dukung)
+                $proteksi->bukti_dukung &&
+                Storage::disk('public')->exists($proteksi->bukti_dukung)
             ) {
-                Storage::disk('public')->delete($identifikasi->bukti_dukung);
+                Storage::disk('public')->delete($proteksi->bukti_dukung);
             }
 
             $file = $request->file('bukti_dukung');
 
             $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
 
-            $identifikasi->bukti_dukung = $file->storeAs(
-                'ikasandi/identifikasi',
+            $proteksi->bukti_dukung = $file->storeAs(
+                'ikasandi/proteksi',
                 $fileName,
                 'public'
             );
@@ -195,7 +194,7 @@ class IdentifikasiController extends Controller
 
         $updater = $this->getUpdater();
 
-        $identifikasi->update([
+        $proteksi->update([
             'kode_soal' => $request->kode_soal,
             'pertanyaan' => $request->pertanyaan,
             'nilai' => $request->nilai,
@@ -221,7 +220,7 @@ class IdentifikasiController extends Controller
             'bukti_dukung' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
+        $soal = IkasandiPertanyaan::proteksi()->findOrFail($request->id);
 
         if ($request->hasFile('bukti_dukung')) {
 
@@ -237,7 +236,7 @@ class IdentifikasiController extends Controller
             $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
-                'ikasandi/identifikasi',
+                'ikasandi/proteksi',
                 $fileName,
                 'public'
             );
@@ -261,21 +260,21 @@ class IdentifikasiController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function destroy(IkasandiPertanyaan $identifikasi)
+    public function destroy(IkasandiPertanyaan $proteksi)
     {
 
-        if ($identifikasi->domain !== 'identifikasi') {
+        if ($proteksi->domain !== 'proteksi') {
             abort(404);
         }
 
         if (
-            $identifikasi->bukti_dukung &&
-            Storage::disk('public')->exists($identifikasi->bukti_dukung)
+            $proteksi->bukti_dukung &&
+            Storage::disk('public')->exists($proteksi->bukti_dukung)
         ) {
-            Storage::disk('public')->delete($identifikasi->bukti_dukung);
+            Storage::disk('public')->delete($proteksi->bukti_dukung);
         }
 
-        $identifikasi->delete();
+        $proteksi->delete();
 
         return back()->with('success', 'Soal berhasil dihapus');
     }
@@ -295,7 +294,7 @@ class IdentifikasiController extends Controller
             'nilai' => 'required|integer|min:0|max:5'
         ]);
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($request->id);
+        $soal = IkasandiPertanyaan::proteksi()->findOrFail($request->id);
 
         $updater = $this->getUpdater();
 
@@ -326,7 +325,7 @@ class IdentifikasiController extends Controller
     public function hapusBukti($id)
     {
 
-        $soal = IkasandiPertanyaan::identifikasi()->findOrFail($id);
+        $soal = IkasandiPertanyaan::proteksi()->findOrFail($id);
 
         if (
             $soal->bukti_dukung &&
@@ -345,7 +344,7 @@ class IdentifikasiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | IMPORT EXCEL
+    | IMPORT EXCEL (HANYA DOMAIN 2)
     |--------------------------------------------------------------------------
     */
 
@@ -379,6 +378,11 @@ class IdentifikasiController extends Controller
 
                 if (!$kodeKategori || !$kodeSoal || !$pertanyaan) continue;
 
+                /* FILTER DOMAIN 2 SAJA */
+                if (!Str::startsWith($kodeKategori, '2')) {
+                    continue;
+                }
+
                 $kategori = IkasandiKategori::where('kode_kategori', $kodeKategori)->first();
 
                 if (!$kategori) continue;
@@ -388,7 +392,7 @@ class IdentifikasiController extends Controller
                 IkasandiPertanyaan::updateOrCreate(
 
                     [
-                        'domain' => 'identifikasi',
+                        'domain' => 'proteksi',
                         'kode_soal' => $kodeSoal
                     ],
 
@@ -406,6 +410,7 @@ class IdentifikasiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Import berhasil');
+
         } catch (\Exception $e) {
 
             DB::rollBack();

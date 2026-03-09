@@ -169,7 +169,7 @@
                     {{-- HEADER --}}
                     <div class="mb-4">
                         <h5 class="fw-semibold mb-1" style="font-size:18px">
-                            Identifikasi - IKASANDI
+                            Deteksi - IKASANDI
                         </h5>
                         <hr class="mt-2 mb-0">
                     </div>
@@ -193,7 +193,7 @@
 
                         <div class="d-flex align-items-center">
 
-                            <form action="{{ route('admin.ikasandi.identifikasi.import') }}" method="POST"
+                            <form action="{{ route('admin.ikasandi.deteksi.import') }}" method="POST"
                                 enctype="multipart/form-data" id="importForm" class="mr-3">
 
                                 @csrf
@@ -274,7 +274,7 @@
                                         {{-- BUKTI --}}
                                         <td class="text-center">
 
-                                            <form action="{{ route('admin.ikasandi.identifikasi.uploadBukti') }}"
+                                            <form action="{{ route('admin.ikasandi.deteksi.uploadBukti') }}"
                                                 method="POST" enctype="multipart/form-data" class="upload-form">
 
                                                 @csrf
@@ -326,7 +326,7 @@
                                                 <i class="fas fa-edit"></i>
                                             </button>
 
-                                            <form action="{{ route('admin.ikasandi.identifikasi.destroy', $item->id) }}"
+                                            <form action="{{ route('admin.ikasandi.deteksi.destroy', $item->id) }}"
                                                 method="POST" class="d-inline delete-form"
                                                 data-title="{{ $item->kode_soal }}">
                                                 @csrf
@@ -360,7 +360,7 @@
     @foreach ($soal as $item)
         <div class="modal fade" id="modalEdit{{ $item->id }}">
             <div class="modal-dialog modal-lg">
-                <form action="{{ route('admin.ikasandi.identifikasi.update', $item->id) }}" method="POST"
+                <form action="{{ route('admin.ikasandi.deteksi.update', $item->id) }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
@@ -375,7 +375,7 @@
                         </div>
 
                         <div class="modal-body">
-                            @include('admin.ikasandi.identifikasi._form', [
+                            @include('admin.ikasandi.deteksi._form', [
                                 'edit' => true,
                                 'item' => $item,
                             ])
@@ -418,7 +418,7 @@
                                 </a>
 
                                 {{-- HAPUS --}}
-                                <form action="{{ route('admin.ikasandi.identifikasi.hapusbukti', $item->id) }}"
+                                <form action="{{ route('admin.ikasandi.deteksi.hapusbukti', $item->id) }}"
                                     method="POST" class="delete-bukti-form d-inline">
 
                                     @csrf
@@ -490,7 +490,7 @@
 
                             if (result.isConfirmed) {
 
-                                fetch("{{ route('admin.ikasandi.identifikasi.updateNilai') }}", {
+                                fetch("{{ route('admin.ikasandi.deteksi.updateNilai') }}", {
 
                                         method: "POST",
                                         headers: {

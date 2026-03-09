@@ -9,6 +9,10 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\IkasandiKategoriController;
 use App\Http\Controllers\Admin\IdentifikasiController;
+use App\Http\Controllers\Admin\ProteksiController;
+use App\Http\Controllers\Admin\DeteksiController;
+use App\Http\Controllers\Admin\GulihController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,6 +59,36 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'identifikasi/hapus-bukti/{id}',
                 [IdentifikasiController::class, 'hapusBukti']
             )->name('identifikasi.hapusbukti');
+
+            //proteksi
+            Route::resource('proteksi', ProteksiController::class)->names('proteksi');
+            Route::post('proteksi/import', [ProteksiController::class, 'import'])->name('proteksi.import');
+            Route::post('proteksi/update-nilai', [ProteksiController::class, 'updateNilai'])->name('proteksi.updateNilai');
+            Route::post('proteksi/upload-bukti', [ProteksiController::class, 'uploadBukti'])->name('proteksi.uploadBukti');
+            Route::delete(
+                'proteksi/hapus-bukti/{id}',
+                [ProteksiController::class, 'hapusBukti']
+            )->name('proteksi.hapusbukti');
+
+            //deteksi
+            Route::resource('deteksi', DeteksiController::class)->names('deteksi');
+            Route::post('deteksi/import', [DeteksiController::class, 'import'])->name('deteksi.import');
+            Route::post('deteksi/update-nilai', [DeteksiController::class, 'updateNilai'])->name('deteksi.updateNilai');
+            Route::post('deteksi/upload-bukti', [DeteksiController::class, 'uploadBukti'])->name('deteksi.uploadBukti');
+            Route::delete(
+                'deteksi/hapus-bukti/{id}',
+                [DeteksiController::class, 'hapusBukti']
+            )->name('deteksi.hapusbukti');
+
+            //gulih
+            Route::resource('gulih', GulihController::class)->names('gulih');
+            Route::post('gulih/import', [GulihController::class, 'import'])->name('gulih.import');
+            Route::post('gulih/update-nilai', [GulihController::class, 'updateNilai'])->name('gulih.updateNilai');
+            Route::post('gulih/upload-bukti', [GulihController::class, 'uploadBukti'])->name('gulih.uploadBukti');
+            Route::delete(
+                'gulih/hapus-bukti/{id}',
+                [GulihController::class, 'hapusBukti']
+            )->name('gulih.hapusbukti');
         });
 
         //Berita berklarifikasi
