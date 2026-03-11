@@ -14,7 +14,6 @@
                     </a>
                 </li>
 
-                <li class="list-divider"></li>
 
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ url('/admin/user') }}" aria-expanded="false">
@@ -23,12 +22,6 @@
                     </a>
                 </li>
 
-                <li class="list-divider"></li>
-
-                <!-- Layanan -->
-                <li class="nav-small-cap">
-                    <span class="hide-menu">Layanan</span>
-                </li>
 
                 <!-- TTE -->
                 <li class="sidebar-item">
@@ -86,21 +79,6 @@
                     <a class="sidebar-link" href="{{ url('/admin/berita') }}" aria-expanded="false">
                         <i data-feather="file-text" class="feather-icon"></i>
                         <span class="hide-menu">Berita Berklasifikasi</span>
-                    </a>
-                </li>
-
-
-                <li class="list-divider"></li>
-
-                <!-- Extra -->
-                <li class="nav-small-cap">
-                    <span class="hide-menu">Laporan</span>
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="ui-cards.html" aria-expanded="false">
-                        <i data-feather="sidebar" class="feather-icon"></i>
-                        <span class="hide-menu">Laporan Insiden</span>
                     </a>
                 </li>
 

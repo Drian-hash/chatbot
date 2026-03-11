@@ -131,11 +131,6 @@ class IkasandiPertanyaan extends Model
         return $query->where('domain', 'deteksi');
     }
 
-    public function scopeRespon($query)
-    {
-        return $query->where('domain', 'respon');
-    }
-
     public function scopeGulih($query)
     {
         return $query->where('domain', 'gulih');

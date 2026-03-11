@@ -3,8 +3,8 @@
 @section('admin')
     <style>
         /* ==============================
-            TABLE RESPONSIVE
-            ============================== */
+                TABLE RESPONSIVE
+                ============================== */
 
         .table-responsive {
             overflow-x: auto;
@@ -35,8 +35,8 @@
 
 
         /* ==============================
-            TOOLBAR
-            ============================== */
+                TOOLBAR
+                ============================== */
 
         .toolbar {
             gap: 8px;
@@ -54,8 +54,8 @@
 
 
         /* ==============================
-            BUTTON
-            ============================== */
+                BUTTON
+                ============================== */
 
         .btn-sm {
             padding: 4px 7px;
@@ -64,8 +64,8 @@
 
 
         /* ==============================
-            MODAL
-            ============================== */
+                MODAL
+                ============================== */
 
         .modal-title {
             font-size: 15px;
@@ -77,8 +77,8 @@
 
 
         /* ==============================
-            MOBILE RESPONSIVE
-            ============================== */
+                MOBILE RESPONSIVE
+                ============================== */
 
         @media (max-width:768px) {
 
@@ -189,7 +189,7 @@
 
                         <!-- RIGHT -->
                         <div class="d-flex align-items-center flex-wrap mb-2 toolbar">
-                            <a href="{{ route('admin.tte.export.excel', request()->query()) }}"
+                            <a href="{{ route('admin.tte.print', request()->query()) }}"
                                 class="btn btn-success btn-sm mr-3">
                                 <i class="fas fa-file-excel"></i> Cetak Laporan
                             </a>

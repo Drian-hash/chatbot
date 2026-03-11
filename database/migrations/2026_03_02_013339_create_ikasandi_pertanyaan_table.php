@@ -20,8 +20,7 @@ return new class extends Migration
                 'identifikasi',
                 'proteksi',
                 'deteksi',
-                'respon',
-                'pulih'
+                'gulih'
             ])->index();
 
             // RELASI KATEGORI

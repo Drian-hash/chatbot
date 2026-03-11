@@ -40,8 +40,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // TTe
         Route::resource('tte', TteController::class)->names('tte');
-        Route::post('tte/import', [TteController::class, 'import'])->name('tte.import');
-        Route::get('tte/export/excel', [TteController::class, 'exportExcel'])->name('tte.export.excel');
+        Route::get('print', [TteController::class, 'print'])->name('tte.print');
 
         // Ikasandi
 
