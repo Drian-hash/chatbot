@@ -37,27 +37,22 @@ class TteController extends Controller
                         ->orWhere('opd', 'LIKE', "%$search%")
                         ->orWhere('no_hp', 'LIKE', "%$search%")
                         ->orWhere('jenis_permohonan', 'LIKE', "%$search%");
-
                 });
-
             })
 
             ->when($jenis_permohonan, function ($query) use ($jenis_permohonan) {
 
                 $query->where('jenis_permohonan', $jenis_permohonan);
-
             })
 
             ->when($bulan, function ($query) use ($bulan) {
 
                 $query->whereMonth('created_at', $bulan);
-
             })
 
             ->when($tahun, function ($query) use ($tahun) {
 
                 $query->whereYear('created_at', $tahun);
-
             })
 
             ->latest()
@@ -67,7 +62,6 @@ class TteController extends Controller
         $tte->appends($request->all());
 
         return view('admin.tte.index', compact('tte'));
-
     }
 
 
@@ -105,7 +99,6 @@ class TteController extends Controller
 
         return redirect()->route('admin.tte.index')
             ->with('success', 'Data permohonan TTE berhasil ditambahkan.');
-
     }
 
 
@@ -122,7 +115,6 @@ class TteController extends Controller
         $tte = TteRequest::findOrFail($id);
 
         return view('admin.tte.show', compact('tte'));
-
     }
 
 
@@ -162,7 +154,6 @@ class TteController extends Controller
 
         return redirect()->route('admin.tte.index')
             ->with('success', 'Data permohonan TTE berhasil diupdate.');
-
     }
 
 
@@ -182,7 +173,6 @@ class TteController extends Controller
 
         return redirect()->route('admin.tte.index')
             ->with('success', 'Data permohonan TTE berhasil dihapus.');
-
     }
 
 
@@ -203,7 +193,6 @@ class TteController extends Controller
             'laporan-permohonan-tte.xlsx'
 
         );
-
     }
 
 
@@ -223,38 +212,38 @@ class TteController extends Controller
 
                 $query->where(function ($q) use ($request) {
 
-                    $q->where('nama_lengkap', 'LIKE', "%$request->search%")
-                        ->orWhere('nip', 'LIKE', "%$request->search%")
-                        ->orWhere('opd', 'LIKE', "%$request->search%");
-
+                    $q->where('nama_lengkap', 'LIKE', "%{$request->search}%")
+                        ->orWhere('nip', 'LIKE', "%{$request->search}%")
+                        ->orWhere('opd', 'LIKE', "%{$request->search}%");
                 });
-
             })
 
             ->when($request->jenis_permohonan, function ($query) use ($request) {
 
                 $query->where('jenis_permohonan', $request->jenis_permohonan);
-
             })
 
             ->when($request->bulan, function ($query) use ($request) {
 
                 $query->whereMonth('created_at', $request->bulan);
-
             })
 
             ->when($request->tahun, function ($query) use ($request) {
 
                 $query->whereYear('created_at', $request->tahun);
-
             })
 
             ->latest()
 
             ->get();
 
-        return view('admin.tte.print', compact('tte'));
 
+        return view('admin.tte.print', [
+            'tte' => $tte,
+            'bulan' => $request->bulan,
+            'tahun' => $request->tahun,
+            'jenis_permohonan' => $request->jenis_permohonan,
+            'search' => $request->search
+        ]);
     }
-
 }
