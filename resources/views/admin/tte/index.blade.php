@@ -3,8 +3,73 @@
 @section('admin')
     <style>
         /* ==============================
-                TABLE RESPONSIVE
-                ============================== */
+            TOOLBAR RESPONSIVE
+       ============================== */
+
+        .toolbar-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-row select {
+            width: 180px;
+        }
+
+        .toolbar-row-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box input {
+            width: 220px;
+        }
+
+
+        /* ==============================
+            MOBILE
+       ============================== */
+
+        @media (max-width:768px) {
+
+            .toolbar-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .toolbar-row select {
+                width: 140px;
+            }
+
+            .toolbar-row-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .search-box input {
+                width: 160px;
+            }
+
+        }
+
+        /* ==============================
+                            TABLE RESPONSIVE
+                            ============================== */
 
         .table-responsive {
             overflow-x: auto;
@@ -35,8 +100,8 @@
 
 
         /* ==============================
-                TOOLBAR
-                ============================== */
+                            TOOLBAR
+                            ============================== */
 
         .toolbar {
             gap: 8px;
@@ -54,8 +119,8 @@
 
 
         /* ==============================
-                BUTTON
-                ============================== */
+                            BUTTON
+                            ============================== */
 
         .btn-sm {
             padding: 4px 7px;
@@ -64,8 +129,8 @@
 
 
         /* ==============================
-                MODAL
-                ============================== */
+                            MODAL
+                            ============================== */
 
         .modal-title {
             font-size: 15px;
@@ -77,13 +142,13 @@
 
 
         /* ==============================
-                MOBILE RESPONSIVE
-                ============================== */
+                            MOBILE RESPONSIVE
+                            ============================== */
 
         @media (max-width:768px) {
 
             .table {
-                min-width: 780px;
+                min-width: 850px;
                 font-size: 12px;
             }
 
@@ -93,6 +158,7 @@
             }
 
             .table td {
+                font-size: 12px;
                 padding: 6px;
             }
 
@@ -127,68 +193,76 @@
                     </div>
 
                     <!-- TOOLBAR -->
+
                     <div class="d-flex justify-content-between align-items-start flex-wrap mb-3 toolbar">
 
-                        <!-- LEFT -->
-                        <div class="d-flex align-items-center flex-wrap mb-2 toolbar">
+                        <!-- LEFT SIDE -->
+                        <div class="d-flex align-items-center flex-nowrap toolbar">
 
                             <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#modalCreate">
                                 <i class="fas fa-plus"></i> Tambah Data
                             </button>
 
-                            <!-- FILTER -->
-                            <form method="GET" action="{{ route('admin.tte.index') }}"
-                                class="d-flex align-items-center flex-wrap">
+                            <form method="GET" action="{{ route('admin.tte.index') }}" class="d-flex align-items-center">
 
                                 <select name="jenis_permohonan" class="form-control form-control-sm mr-2"
                                     style="width:180px;">
+
                                     <option value="">Semua Layanan</option>
+
                                     <option value="Permohonan TTE Baru (Belum Mempunyai TTE)"
                                         {{ request('jenis_permohonan') == 'Permohonan TTE Baru (Belum Mempunyai TTE)' ? 'selected' : '' }}>
                                         TTE Baru
                                     </option>
+
                                     <option value="Lupa Passphrase TTE"
                                         {{ request('jenis_permohonan') == 'Lupa Passphrase TTE' ? 'selected' : '' }}>
                                         Lupa Passphrase
                                     </option>
+
                                     <option value="Pembaharuan TTE ( TTE Expired)"
                                         {{ request('jenis_permohonan') == 'Pembaharuan TTE ( TTE Expired)' ? 'selected' : '' }}>
                                         Pembaharuan
                                     </option>
+
                                 </select>
 
                                 <select name="bulan" class="form-control form-control-sm mr-2" style="width:120px;">
+
                                     <option value="">Bulan</option>
+
                                     @for ($i = 1; $i <= 12; $i++)
                                         <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
                                             {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
                                         </option>
                                     @endfor
+
                                 </select>
 
                                 <select name="tahun" class="form-control form-control-sm mr-2" style="width:100px;">
+
                                     <option value="">Tahun</option>
+
                                     @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
                                         <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>
                                             {{ $y }}
                                         </option>
                                     @endfor
+
                                 </select>
 
                                 <button type="submit" class="btn btn-sm btn-primary mr-2">
                                     <i class="fas fa-filter"></i>
                                 </button>
 
-                                @if (request()->query())
-                                    <a href="{{ route('admin.tte.index') }}" class="btn btn-sm btn-secondary">
-                                        <i class="fas fa-sync"></i>
-                                    </a>
-                                @endif
+
                             </form>
+
                         </div>
 
-                        <!-- RIGHT -->
-                        <div class="d-flex align-items-center flex-wrap mb-2 toolbar">
+                        <!-- RIGHT SIDE -->
+                        <div class="d-flex align-items-center flex-nowrap">
+
                             <a href="{{ route('admin.tte.print', request()->query()) }}"
                                 class="btn btn-success btn-sm mr-3">
                                 <i class="fas fa-file-excel"></i> Cetak Laporan
@@ -197,7 +271,9 @@
                             <form method="GET" action="{{ route('admin.tte.index') }}" class="d-flex">
 
                                 <input type="hidden" name="jenis_permohonan" value="{{ request('jenis_permohonan') }}">
+
                                 <input type="hidden" name="bulan" value="{{ request('bulan') }}">
+
                                 <input type="hidden" name="tahun" value="{{ request('tahun') }}">
 
                                 <input type="text" name="search" value="{{ request('search') }}"
@@ -207,8 +283,11 @@
                                 <button type="submit" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-search"></i>
                                 </button>
+
                             </form>
+
                         </div>
+
                     </div>
 
                     <!-- TABLE -->
