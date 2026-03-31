@@ -17,7 +17,7 @@ class IdentifikasiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DETEKSI USER UPDATE
+    | IDENTIFIKASI USER UPDATE
     |--------------------------------------------------------------------------
     */
 
@@ -49,7 +49,7 @@ class IdentifikasiController extends Controller
         $kategoriList = IkasandiKategori::where('is_active', true)
             ->where(function ($q) {
                 $q->where('kode_kategori', '1')
-                    ->orWhere('kode_kategori', 'like', '1.%');
+                  ->orWhere('kode_kategori', 'like', '1.%');
             })
             ->orderByRaw("
                 CAST(SUBSTRING_INDEX(kode_kategori,'.',1) AS UNSIGNED),
@@ -57,7 +57,6 @@ class IdentifikasiController extends Controller
                 CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(kode_kategori,'.',3),'.',-1) AS UNSIGNED)
             ")
             ->get();
-
 
         $kodeKategori = $request->kategori ?? $kategoriList->first()?->kode_kategori;
         $search = $request->search;
@@ -73,10 +72,14 @@ class IdentifikasiController extends Controller
                 ->where('kategori_id', $kategori->id)
 
                 ->when($search, function ($query) use ($search) {
+
                     $query->where(function ($q) use ($search) {
+
                         $q->where('kode_soal', 'like', "%$search%")
-                            ->orWhere('pertanyaan', 'like', "%$search%");
+                          ->orWhere('pertanyaan', 'like', "%$search%");
+
                     });
+
                 })
 
                 ->orderByRaw("LENGTH(kode_soal), kode_soal")
@@ -94,6 +97,7 @@ class IdentifikasiController extends Controller
                         : null;
 
                     return $item;
+
                 });
         }
 
@@ -127,7 +131,7 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
                 'ikasandi/identifikasi',
@@ -184,7 +188,7 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
             $identifikasi->bukti_dukung = $file->storeAs(
                 'ikasandi/identifikasi',
@@ -234,7 +238,7 @@ class IdentifikasiController extends Controller
 
             $file = $request->file('bukti_dukung');
 
-            $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
             $filePath = $file->storeAs(
                 'ikasandi/identifikasi',
@@ -257,7 +261,7 @@ class IdentifikasiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DELETE SOAL
+    | DELETE
     |--------------------------------------------------------------------------
     */
 
@@ -368,9 +372,7 @@ class IdentifikasiController extends Controller
 
                 if ($index == 0) continue;
 
-                if (empty($row[0]) && empty($row[1]) && empty($row[2])) {
-                    continue;
-                }
+                if (empty($row[0]) && empty($row[1]) && empty($row[2])) continue;
 
                 $kodeKategori = trim($row[0] ?? '');
                 $kodeSoal = trim($row[1] ?? '');
@@ -378,6 +380,12 @@ class IdentifikasiController extends Controller
                 $nilai = $row[3] ?? 0;
 
                 if (!$kodeKategori || !$kodeSoal || !$pertanyaan) continue;
+
+                /* FILTER DOMAIN 3 */
+
+                if (!Str::startsWith($kodeKategori, '4')) {
+                    continue;
+                }
 
                 $kategori = IkasandiKategori::where('kode_kategori', $kodeKategori)->first();
 
@@ -406,14 +414,13 @@ class IdentifikasiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Import berhasil');
+
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                'Import gagal : ' . $e->getMessage()
-            );
+            return back()->with('error', 'Import gagal : '.$e->getMessage());
+
         }
     }
 }

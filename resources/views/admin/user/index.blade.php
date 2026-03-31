@@ -192,12 +192,12 @@
                                         <td class="text-center">
 
                                             {{-- SHOW --}}
-                                            <button class="btn btn-secondary btn-sm" data-toggle="modal"
+                                            {{-- <button class="btn btn-secondary btn-sm" data-toggle="modal"
                                                 data-target="#modalShow{{ $user->id }}">
 
                                                 <i class="fas fa-eye"></i>
 
-                                            </button>
+                                            </button> --}}
 
 
                                             {{-- EDIT --}}

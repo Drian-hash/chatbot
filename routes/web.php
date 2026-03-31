@@ -30,6 +30,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('chart-tte',[DashboardController::class,'chartTte']);
+        Route::get('chart-berita', [DashboardController::class,'chartBerita']);
 
         // profile
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');

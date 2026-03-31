@@ -258,12 +258,12 @@
 
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" required>
+               <input type="text" name="username" placeholder="Masukkan username" required>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" placeholder="Masukkan password" required>
             </div>
 
             <div class="remember">

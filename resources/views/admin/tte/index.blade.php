@@ -3,8 +3,8 @@
 @section('admin')
     <style>
         /* ==============================
-            TOOLBAR RESPONSIVE
-       ============================== */
+                                TOOLBAR RESPONSIVE
+                           ============================== */
 
         .toolbar-wrapper {
             display: flex;
@@ -41,8 +41,8 @@
 
 
         /* ==============================
-            MOBILE
-       ============================== */
+                                MOBILE
+                           ============================== */
 
         @media (max-width:768px) {
 
@@ -68,8 +68,8 @@
         }
 
         /* ==============================
-                            TABLE RESPONSIVE
-                            ============================== */
+                                                TABLE RESPONSIVE
+                                                ============================== */
 
         .table-responsive {
             overflow-x: auto;
@@ -100,8 +100,8 @@
 
 
         /* ==============================
-                            TOOLBAR
-                            ============================== */
+                                                TOOLBAR
+                                                ============================== */
 
         .toolbar {
             gap: 8px;
@@ -119,8 +119,8 @@
 
 
         /* ==============================
-                            BUTTON
-                            ============================== */
+                                                BUTTON
+                                                ============================== */
 
         .btn-sm {
             padding: 4px 7px;
@@ -129,8 +129,8 @@
 
 
         /* ==============================
-                            MODAL
-                            ============================== */
+                                                MODAL
+                                                ============================== */
 
         .modal-title {
             font-size: 15px;
@@ -142,8 +142,8 @@
 
 
         /* ==============================
-                            MOBILE RESPONSIVE
-                            ============================== */
+                                                MOBILE RESPONSIVE
+                                                ============================== */
 
         @media (max-width:768px) {
 
@@ -344,51 +344,151 @@
 
                                     <!-- SHOW MODAL -->
                                     <div class="modal fade" id="modalShow{{ $item->id }}">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                                            <div class="modal-content shadow">
-                                                <div class="modal-header bg-secondary text-white">
+
+                                        <div class="modal-dialog modal-lg">
+
+                                            <div class="modal-content">
+
+                                                <!-- HEADER -->
+                                                <div class="btn btn-secondary btn-sm">
+
                                                     <h5 class="modal-title">
-                                                        <i class="fas fa-eye"></i> Detail Permohonan
+                                                        Detail Permohonan TTE
                                                     </h5>
+
                                                     <button type="button" class="close text-white" data-dismiss="modal">
                                                         <span>&times;</span>
                                                     </button>
+
                                                 </div>
+
+                                                <!-- BODY -->
                                                 <div class="modal-body">
-                                                    <strong>Nama:</strong> {{ $item->nama_lengkap }} <br>
-                                                    <strong>NIP:</strong> {{ $item->nip ?? '-' }} <br>
-                                                    <strong>OPD:</strong> {{ $item->opd ?? '-' }} <br>
-                                                    <strong>No HP:</strong> {{ $item->no_hp ?? '-' }} <br>
-                                                    <strong>Jenis:</strong> {{ $item->jenis_permohonan }} <br>
-                                                    <strong>Dibuat:</strong> {{ $item->created_at->format('d M Y H:i') }}
-                                                    <br>
-                                                    <strong>Update:</strong> {{ $item->updated_at->format('d M Y H:i') }}
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 font-weight-bold">Nama</div>
+                                                        <div class="col-md-8">: {{ $item->nama_lengkap }}</div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 font-weight-bold">NIP</div>
+                                                        <div class="col-md-8">: {{ $item->nip ?? '-' }}</div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 font-weight-bold">OPD</div>
+                                                        <div class="col-md-8">: {{ $item->opd ?? '-' }}</div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 font-weight-bold">No HP</div>
+                                                        <div class="col-md-8">: {{ $item->no_hp ?? '-' }}</div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4 font-weight-bold">Jenis Permohonan</div>
+                                                        <div class="col-md-8">
+                                                            :
+                                                            <span class="badge badge-info">
+                                                                {{ $item->jenis_permohonan }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <hr>
+
+                                                    <div class="row mb-2">
+                                                        <div class="col-md-4 font-weight-bold">Dibuat</div>
+                                                        <div class="col-md-8">:
+                                                            {{ $item->created_at->format('d M Y H:i') }}</div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-4 font-weight-bold">Update</div>
+                                                        <div class="col-md-8">:
+                                                            {{ $item->updated_at->format('d M Y H:i') }}</div>
+                                                    </div>
+
                                                 </div>
+
+                                                <!-- FOOTER -->
+                                                <div class="modal-footer">
+
+                                                    <button class="btn btn-secondary" data-dismiss="modal">
+                                                        Tutup
+                                                    </button>
+
+                                                </div>
+
                                             </div>
+
                                         </div>
+
                                     </div>
 
                                     <!-- EDIT MODAL -->
                                     <div class="modal fade" id="modalEdit{{ $item->id }}">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                                            <form action="{{ route('admin.tte.update', $item->id) }}" method="POST">
+
+                                        <div class="modal-dialog modal-lg">
+
+                                            <form action="{{ route('admin.tte.update', $item->id) }}" method="POST"
+                                                enctype="multipart/form-data">
+
                                                 @csrf
                                                 @method('PUT')
-                                                <div class="modal-content shadow">
+
+                                                <div class="modal-content">
+
                                                     <div class="modal-header bg-warning text-white">
-                                                        <h5 class="modal-title">Edit Permohonan</h5>
+
+                                                        <h5 class="modal-title">
+
+                                                            Edit Data Permohonan TTE
+
+                                                        </h5>
+
                                                         <button type="button" class="close text-white"
                                                             data-dismiss="modal">
+
                                                             <span>&times;</span>
+
                                                         </button>
+
                                                     </div>
+
+
                                                     <div class="modal-body">
-                                                        @include('admin.tte._form', ['edit' => true])
+
+                                                        @include('admin.tte._form', [
+                                                            'edit' => true,
+                                                        ])
+
                                                     </div>
+
+
+                                                    <div class="modal-footer">
+
+                                                        <button class="btn btn-secondary" data-dismiss="modal">
+
+                                                            Batal
+
+                                                        </button>
+
+                                                        <button class="btn btn-warning text-white">
+
+                                                            Update
+
+                                                        </button>
+
+                                                    </div>
+
                                                 </div>
+
                                             </form>
+
                                         </div>
                                     </div>
+
 
                                 @empty
                                     <tr>
@@ -439,34 +539,86 @@
 
     <!-- CREATE MODAL (DIBESARKAN SEPERTI EDIT) -->
     <div class="modal fade" id="modalCreate">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <form action="{{ route('admin.tte.store') }}" method="POST">
+
+        <div class="modal-dialog modal-lg">
+
+            <form action="{{ route('admin.tte.store') }}" method="POST" enctype="multipart/form-data">
+
                 @csrf
-                <div class="modal-content shadow">
+
+                <div class="modal-content">
+
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Tambah Permohonan</h5>
+
+                        <h5 class="modal-title">
+
+                            Tambah Permohonan TTE
+
+                        </h5>
+
                         <button type="button" class="close text-white" data-dismiss="modal">
+
                             <span>&times;</span>
+
                         </button>
+
                     </div>
+
+
                     <div class="modal-body">
+
                         @include('admin.tte._form')
+
                     </div>
+
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Simpan
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 
+                        <button class="btn btn-secondary" data-dismiss="modal">
+
+                            Batal
+
+                        </button>
+
+                        <button class="btn btn-primary">
+
+                            Simpan
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
     <!-- SWEETALERT TIDAK DIUBAH -->
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '{{ session('error') }}'
+            });
+        </script>
+    @endif
+
     @push('scripts')
         <script>
             document.addEventListener("DOMContentLoaded", function() {
