@@ -4,18 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\TteController;
+use App\Http\Controllers\Admin\LayananController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\KeywordController;
+use App\Http\Controllers\Admin\ChatLogController;
+use App\Http\Controllers\Admin\ChatbotController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\BeritaController;
-use App\Http\Controllers\Admin\IkasandiKategoriController;
-use App\Http\Controllers\Admin\IdentifikasiController;
-use App\Http\Controllers\Admin\ProteksiController;
-use App\Http\Controllers\Admin\DeteksiController;
-use App\Http\Controllers\Admin\GulihController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('admin.login');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -30,8 +28,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('chart-tte',[DashboardController::class,'chartTte']);
-        Route::get('chart-berita', [DashboardController::class,'chartBerita']);
 
         // profile
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
@@ -39,61 +35,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // User
         Route::resource('user', UserController::class)->names('user');
+        Route::get('user/export', [UserController::class, 'export'])->name('user.export');
 
-        // TTe
-        Route::resource('tte', TteController::class)->names('tte');
-        Route::get('print', [TteController::class, 'print'])->name('tte.print');
+        //Pelayanan
+        Route::resource('layanan', LayananController::class)->names('layanan');
 
-        // Ikasandi
+        //Faq
+        Route::resource('faq', FaqController::class);
+        Route::post('faq/import', [FaqController::class, 'import'])->name('faq.import');
 
-        Route::prefix('ikasandi')->name('ikasandi.')->group(function () {
+        //keyword
+        Route::resource('keyword', KeywordController::class)->names('keyword');
 
-            //kategori
-            Route::resource('kategori', IkasandiKategoriController::class)->names('kategori');
+        //chatlog
+        Route::resource('chatlog', ChatLogController::class)->names('chatlog');
 
-            //identifikasi
-            Route::resource('identifikasi', IdentifikasiController::class)->names('identifikasi');
-            Route::post('identifikasi/import', [IdentifikasiController::class, 'import'])->name('identifikasi.import');
-            Route::post('identifikasi/update-nilai', [IdentifikasiController::class, 'updateNilai'])->name('identifikasi.updateNilai');
-            Route::post('identifikasi/upload-bukti', [IdentifikasiController::class, 'uploadBukti'])->name('identifikasi.uploadBukti');
-            Route::delete(
-                'identifikasi/hapus-bukti/{id}',
-                [IdentifikasiController::class, 'hapusBukti']
-            )->name('identifikasi.hapusbukti');
-
-            //proteksi
-            Route::resource('proteksi', ProteksiController::class)->names('proteksi');
-            Route::post('proteksi/import', [ProteksiController::class, 'import'])->name('proteksi.import');
-            Route::post('proteksi/update-nilai', [ProteksiController::class, 'updateNilai'])->name('proteksi.updateNilai');
-            Route::post('proteksi/upload-bukti', [ProteksiController::class, 'uploadBukti'])->name('proteksi.uploadBukti');
-            Route::delete(
-                'proteksi/hapus-bukti/{id}',
-                [ProteksiController::class, 'hapusBukti']
-            )->name('proteksi.hapusbukti');
-
-            //deteksi
-            Route::resource('deteksi', DeteksiController::class)->names('deteksi');
-            Route::post('deteksi/import', [DeteksiController::class, 'import'])->name('deteksi.import');
-            Route::post('deteksi/update-nilai', [DeteksiController::class, 'updateNilai'])->name('deteksi.updateNilai');
-            Route::post('deteksi/upload-bukti', [DeteksiController::class, 'uploadBukti'])->name('deteksi.uploadBukti');
-            Route::delete(
-                'deteksi/hapus-bukti/{id}',
-                [DeteksiController::class, 'hapusBukti']
-            )->name('deteksi.hapusbukti');
-
-            //gulih
-            Route::resource('gulih', GulihController::class)->names('gulih');
-            Route::post('gulih/import', [GulihController::class, 'import'])->name('gulih.import');
-            Route::post('gulih/update-nilai', [GulihController::class, 'updateNilai'])->name('gulih.updateNilai');
-            Route::post('gulih/upload-bukti', [GulihController::class, 'uploadBukti'])->name('gulih.uploadBukti');
-            Route::delete(
-                'gulih/hapus-bukti/{id}',
-                [GulihController::class, 'hapusBukti']
-            )->name('gulih.hapusbukti');
-        });
-
-        //Berita berklarifikasi
-        Route::resource('berita', BeritaController::class)->names('berita');
-        Route::get('berita/export/excel', [BeritaController::class, 'exportExcel'])->name('berita.export.excel');
+        Route::post('/webhook/wa', [ChatbotController::class, 'webhook']);
     });
 });

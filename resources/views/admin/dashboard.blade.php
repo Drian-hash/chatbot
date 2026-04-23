@@ -1,92 +1,314 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="id">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <title>Dashboard Admin</title>
 
-    <!-- Responsive -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- ICON -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="{{ asset('images/logo2.png') }}">
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-    <title>SIPASANDI</title>
+        body {
+            background: #f5f6fa;
+            transition: 0.3s;
+        }
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/extra-libs/c3/c3.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/libs/chartist/dist/chartist.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css') }}">
-    <link rel="stylesheet" href="{{ asset('dist/css/style.min.css') }}">
+        .container {
+            display: flex;
+        }
 
-    <!-- IE8 Support -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR (TYPO & SPACING FIX) ===== */
+        .sidebar {
+            width: 260px;
+            background: #fff;
+            height: 100vh;
+            padding: 22px 14px;
+            /* sedikit lebih lega */
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* LOGO */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 26px;
+            padding-left: 8px;
+        }
+
+        .logo img {
+            width: 42px;
+        }
+
+        .logo-text {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        /* LIST */
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* SECTION TITLE */
+        .menu-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin: 18px 10px 8px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        /* ITEM */
+        .sidebar li {
+            margin: 6px 0;
+            /* 🔥 lebih lega */
+        }
+
+        /* LINK */
+        .sidebar li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            /* 🔥 lebih nyaman */
+            border-radius: 10px;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.15s ease;
+        }
+
+        /* ICON */
+        .sidebar li i {
+            width: 20px;
+            font-size: 15px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        /* TEXT */
+        .sidebar li span {
+            line-height: 1;
+        }
+
+        /* HOVER */
+        .sidebar li a:hover {
+            background: #f9fafb;
+        }
+
+        /* ACTIVE */
+        .sidebar li.active a {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .menu-toggle {
+            font-size: 18px;
+            cursor: pointer;
+            color: #374151;
+        }
+
+        .menu-toggle:hover {
+            color: #111827;
+        }
+
+        /* GARIS KIRI */
+        .sidebar li.active a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: #22c55e;
+            border-radius: 2px;
+        }
+
+        /* ===== PROFILE ===== */
+        .profile {
+            border-top: 1px solid #eee;
+            padding: 14px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: #6b7280;
+            color: white;
+            border-radius: 50%;
+            font-size: 13px;
+        }
+
+        .profile-text strong {
+            font-size: 13px;
+        }
+
+        .profile-text small {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            flex: 1;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 60px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-icon {
+            cursor: pointer;
+        }
+
+        /* CONTENT */
+        .content-area {
+            padding: 20px;
+        }
+
+        .table-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            text-align: left;
+        }
+
+        td,
+        th {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* ===== DARK MODE ===== */
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        body.dark .sidebar {
+            background: #020617;
+            border-right: 1px solid #1e293b;
+        }
+
+        body.dark .sidebar li a {
+            color: #cbd5f5;
+        }
+
+        body.dark .sidebar li a:hover {
+            background: #1e293b;
+        }
+
+        body.dark .sidebar li.active a {
+            background: #1e293b;
+        }
+
+        body.dark .navbar {
+            background: #020617;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        /* 🔥 FIX TABLE DARK */
+        body.dark .table-box {
+            background: #020617;
+            border: 1px solid #1e293b;
+        }
+
+        body.dark th {
+            background: #0f172a;
+            color: #cbd5f5;
+        }
+
+        body.dark td {
+            color: #e2e8f0;
+        }
+
+        body.dark td,
+        body.dark th {
+            border-bottom: 1px solid #1e293b;
+        }
+
+        body.dark tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark input,
+        body.dark select {
+            background: #020617;
+            color: #e2e8f0;
+            border: 1px solid #1e293b;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- Preloader -->
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
-        </div>
-    </div>
+    <div class="container">
 
-    <!-- Main Wrapper -->
-    <div id="main-wrapper"
-        data-theme="light"
-        data-layout="vertical"
-        data-navbarbg="skin6"
-        data-sidebartype="full"
-        data-sidebar-position="fixed"
-        data-header-position="fixed"
-        data-boxed-layout="full">
-
-        <!-- Navbar -->
-        @include('admin.components.navbar')
-
-        <!-- Sidebar -->
+        <!-- SIDEBAR -->
         @include('admin.components.sidebar')
+        <!-- MAIN -->
+        <div class="main">
 
-        <!-- Content -->
-        @yield('admin')
+            @include('admin.components.navbar')
+
+            <div class="content-area">
+                @yield('admin')
+            </div>
+
+        </div>
 
     </div>
 
-    <!-- JS -->
-    <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+        }
 
-    <!-- Bootstrap Bundle (sudah termasuk Popper) -->
-    <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Apps -->
-    <script src="{{ asset('dist/js/app-style-switcher.js') }}"></script>
-    <script src="{{ asset('dist/js/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js') }}"></script>
-    <script src="{{ asset('dist/js/sidebarmenu.js') }}"></script>
-    <script src="{{ asset('dist/js/custom.min.js') }}"></script>
-
-    <!-- Dashboard -->
-    <script src="{{ asset('assets/extra-libs/c3/d3.min.js') }}"></script>
-    <script src="{{ asset('assets/extra-libs/c3/c3.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/chartist/dist/chartist.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
-    <script src="{{ asset('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js') }}"></script>
-    <script src="{{ asset('assets/extra-libs/jvector/jquery-jvectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('dist/js/pages/dashboards/dashboard1.min.js') }}"></script>
-
-    <!-- SweetAlert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- Script tambahan dari halaman lain -->
-    @stack('scripts')
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+        }
+    </script>
 
 </body>
 

@@ -1,91 +1,87 @@
-<aside class="left-sidebar" data-sidebarbg="skin6">
-    <!-- Sidebar scroll -->
-    <div class="scroll-sidebar" data-sidebarbg="skin6">
+<aside class="sidebar" id="sidebar">
 
-        <!-- Sidebar navigation -->
-        <nav class="sidebar-nav">
-            <ul id="sidebarnav">
+    <div>
 
-                <!-- Dashboard -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ url('/admin/dashboard') }}" aria-expanded="false">
-                        <i data-feather="home" class="feather-icon"></i>
-                        <span class="hide-menu">Dashboard</span>
-                    </a>
-                </li>
+        <!-- LOGO -->
+        <h2 class="logo">
+            <img src="{{ asset('img/logo/logo.png') }}" alt="logo">
+            <span class="logo-text">SILAPU</span>
+        </h2>
 
+        <ul>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ url('/admin/user') }}" aria-expanded="false">
-                        <i data-feather="users" class="feather-icon"></i>
-                        <span class="hide-menu">User</span>
-                    </a>
-                </li>
+            <!-- DASHBOARD -->
+            <li class="{{ request()->is('admin/dashboard*') ? 'active' : '' }}">
+               <a href="{{ route('admin.dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
 
+            <!-- MASTER DATA -->
+            <small class="menu-title">MASTER DATA</small>
 
-                <!-- TTE -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ url('/admin/tte') }}" aria-expanded="false">
-                        <i data-feather="file-text" class="feather-icon"></i>
-                        <span class="hide-menu">TTE</span>
-                    </a>
-                </li>
+            <li class="{{ request()->is('admin/layanan*') ? 'active' : '' }}">
+                <a href="{{ route('admin.layanan.index') }}">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Layanan</span>
+                </a>
+            </li>
 
+            <li class="{{ request()->is('admin/faq*') ? 'active' : '' }}">
+                <a href="{{ route('admin.faq.index') }}">
+                    <i class="fas fa-comments"></i>
+                    <span>FAQ</span>
+                </a>
+            </li>
 
-                <!-- IKASANDI -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                        <i data-feather="shield" class="feather-icon"></i>
-                        <span class="hide-menu">IKASANDI</span>
-                    </a>
+            <!-- OPERASIONAL -->
+            <small class="menu-title">OPERASIONAL</small>
 
-                    <ul aria-expanded="false" class="collapse first-level base-level-line">
+            <li class="{{ request()->is('admin/keyword*') ? 'active' : '' }}">
+                <a href="{{ route('admin.keyword.index') }}">
+                    <i class="fas fa-robot"></i>
+                    <span>Auto Response</span>
+                </a>
+            </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/kategori') }}" class="sidebar-link">
-                                <span class="hide-menu">Kategori</span>
-                            </a>
-                        </li>
+            <!-- MONITORING -->
+            <small class="menu-title">MONITORING</small>
 
-                        <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/identifikasi') }}" class="sidebar-link">
-                                <span class="hide-menu">Identifikasi</span>
-                            </a>
-                        </li>
+            <li class="{{ request()->is('admin/chatlog*') ? 'active' : '' }}">
+                <a href="{{ route('admin.chatlog.index') }}">
+                    <i class="fas fa-comments"></i>
+                    <span>Pesan</span>
+                </a>
+            </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/proteksi') }}" class="sidebar-link">
-                                <span class="hide-menu">Proteksi</span>
-                            </a>
-                        </li>
+            <!-- SISTEM -->
+            <small class="menu-title">SISTEM</small>
 
-                        <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/deteksi') }}" class="sidebar-link">
-                                <span class="hide-menu">Deteksi</span>
-                            </a>
-                        </li>
+            <li class="{{ request()->is('admin/user*') ? 'active' : '' }}">
+                <a href="{{ route('admin.user.index') }}">
+                    <i class="fas fa-users"></i>
+                    <span>Pengguna</span>
+                </a>
+            </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ url('/admin/ikasandi/gulih') }}" class="sidebar-link">
-                                <span class="hide-menu">Gulih</span>
-                            </a>
-                        </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </a>
+            </li>
 
-                    </ul>
-                </li>
-
-                <!-- Cards -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ url('/admin/berita') }}" aria-expanded="false">
-                        <i data-feather="file-text" class="feather-icon"></i>
-                        <span class="hide-menu">Berita Berklasifikasi</span>
-                    </a>
-                </li>
-
-            </ul>
-        </nav>
-        <!-- End Sidebar navigation -->
-
+        </ul>
     </div>
-    <!-- End Sidebar scroll -->
+
+    <!-- PROFILE -->
+    <div class="profile">
+        <div class="avatar">AD</div>
+        <div class="profile-text">
+            <strong>Admin</strong><br>
+            <small>admin@kominfo.go.id</small>
+        </div>
+    </div>
+
 </aside>
