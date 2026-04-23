@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ChatLogController;
 use App\Http\Controllers\Admin\ChatbotController;
 use App\Http\Controllers\Admin\ProfileController;
 
+Route::post('/webhook/wa', [ChatbotController::class, 'webhook']);
 
 Route::get('/', function () {
     return redirect()->route('admin.login');
@@ -50,6 +51,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         //chatlog
         Route::resource('chatlog', ChatLogController::class)->names('chatlog');
 
-        Route::post('/webhook/wa', [ChatbotController::class, 'webhook']);
+
     });
 });

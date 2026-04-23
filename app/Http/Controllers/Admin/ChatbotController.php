@@ -9,16 +9,23 @@ use App\Models\ChatLog;
 use App\Models\Keyword;
 use App\Models\Faq;
 use App\Models\Layanan;
-use OpenAI;
 
 class ChatbotController extends Controller
 {
+    // =========================================================
+    // 🔥 WEBHOOK FONNTE (MASUK DARI WHATSAPP)
+    // =========================================================
     public function webhook(Request $request)
     {
-        // 🔥 AMBIL DATA DARI WA
-        $phone = $request->input('From');
-        $message = strtolower($request->input('Body'));
+        // 🔥 AMBIL DATA DARI FONNTE
+        $phone = $request->input('sender');
+        $message = strtolower(trim($request->input('message')));
         $name = 'User';
+
+        // 🔥 VALIDASI
+        if (!$phone || !$message) {
+            return response()->json(['status' => 'invalid']);
+        }
 
         // 🔥 SIMPAN / CEK USER
         $user = User::firstOrCreate(
@@ -34,100 +41,97 @@ class ChatbotController extends Controller
         // 🔥 TAMBAH JUMLAH PESAN
         $user->increment('total_messages');
 
-        // 🔥 SIMPAN CHAT
+        // 🔥 SIMPAN CHAT MASUK
         $chat = ChatLog::create([
             'user_id' => $user->id,
             'message' => $message
         ]);
 
-        // 🔥 AMBIL JAWABAN (DB + AI MEMORY)
-        $reply = $this->getReply($message, $user->id);
+        // 🔥 AMBIL JAWABAN
+        $reply = $this->getReply($message);
 
-        // 🔥 UPDATE REPLY
+        // 🔥 SIMPAN BALASAN
         $chat->update([
             'reply' => $reply
         ]);
 
         $user->save();
 
-        // 🔥 BALAS KE WHATSAPP
-        return response($reply);
+        // 🔥 KIRIM KE WHATSAPP
+        $this->sendMessage($phone, $reply);
+
+        return response()->json(['status' => 'success']);
     }
 
     // =========================================================
-    // 🔥 LOGIKA BOT (DATABASE + AI)
+    // 🔥 LOGIKA BOT (PRIORITAS DATABASE)
     // =========================================================
-    private function getReply($message, $userId)
+    private function getReply($message)
     {
         // 🔹 1. KEYWORD
         $keyword = Keyword::where('kata_kunci', 'like', "%$message%")->first();
-        if ($keyword) return $keyword->jawaban;
+        if ($keyword) {
+            return $keyword->jawaban;
+        }
 
         // 🔹 2. FAQ
         $faq = Faq::where('pertanyaan', 'like', "%$message%")->first();
-        if ($faq) return $faq->jawaban;
+        if ($faq) {
+            return $faq->jawaban;
+        }
 
         // 🔹 3. LAYANAN
         $layanan = Layanan::where('nama_layanan', 'like', "%$message%")->first();
-        if ($layanan) return $layanan->deskripsi;
+        if ($layanan) {
+            return $layanan->deskripsi;
+        }
 
-        // 🔥 4. FALLBACK KE AI + MEMORY
-        return $this->askAI($message, $userId);
+        // 🔥 4. FALLBACK → MENU LAYANAN
+        return $this->menuLayanan();
     }
 
     // =========================================================
-    // 🔥 AI MEMORY (INGAT PERCAKAPAN)
+    // 🔥 MENU LAYANAN (JIKA TIDAK PAHAM)
     // =========================================================
-    private function askAI($message, $userId)
+    private function menuLayanan()
     {
-        $client = OpenAI::client(env('OPENAI_API_KEY'));
+        $layanans = Layanan::all();
 
-        // 🔥 AMBIL 10 CHAT TERAKHIR
-        $histories = ChatLog::where('user_id', $userId)
-            ->latest()
-            ->take(10)
-            ->get()
-            ->reverse();
+        $text = "Maaf, kami tidak memahami maksud Anda.\n\n";
+        $text .= "Silakan pilih layanan berikut:\n\n";
 
-        $messages = [];
-
-        // 🔹 SYSTEM ROLE
-        $messages[] = [
-            'role' => 'system',
-            'content' => 'Kamu adalah chatbot resmi Dinas Kominfo Ketapang. Jawab dengan sopan, singkat, dan jelas.'
-        ];
-
-        // 🔹 MASUKKAN HISTORY
-        foreach ($histories as $chat) {
-            $messages[] = [
-                'role' => 'user',
-                'content' => $chat->message
-            ];
-
-            if ($chat->reply) {
-                $messages[] = [
-                    'role' => 'assistant',
-                    'content' => $chat->reply
-                ];
-            }
+        foreach ($layanans as $i => $layanan) {
+            $text .= ($i + 1) . ". " . $layanan->nama_layanan . "\n";
         }
 
-        // 🔹 TAMBAH INPUT TERBARU
-        $messages[] = [
-            'role' => 'user',
-            'content' => $message
-        ];
+        $text .= "\nKetik nama layanan untuk informasi lebih lanjut.";
 
-        try {
-            $response = $client->chat()->create([
-                'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
-                'messages' => $messages,
-                'temperature' => 0.5,
-            ]);
+        return $text;
+    }
 
-            return $response->choices[0]->message->content;
-        } catch (\Exception $e) {
-            return "Maaf, sistem sedang mengalami gangguan.";
-        }
+    // =========================================================
+    // 🔥 KIRIM PESAN KE WHATSAPP (FONNTE)
+    // =========================================================
+    private function sendMessage($target, $message)
+    {
+        $token = env('FONNTE_TOKEN');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://api.fonnte.com/send",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => [
+                'target' => $target,
+                'message' => $message,
+            ],
+            CURLOPT_HTTPHEADER => [
+                "Authorization: $token"
+            ],
+        ]);
+
+        curl_exec($curl);
+        curl_close($curl);
     }
 }
