@@ -9,43 +9,66 @@ class ChatLog extends Model
     protected $table = 'chat_logs';
 
     protected $fillable = [
+
         'user_id',
-        'message',
-        'reply',
-        'faq_id',
+
         'layanan_id',
-        'keyword_id' // 🔥 tambahkan ini
+
+        'faq_id',
+
+        'admin_id',
+
+        'sender',
+
+        'message',
+
+        'status',
+
+        'is_llm'
+
     ];
 
-    /**
-     * 🔗 Relasi ke User
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI USER
+    |--------------------------------------------------------------------------
+    */
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * 🔗 Relasi ke FAQ
-     */
-    public function faq()
-    {
-        return $this->belongsTo(Faq::class);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI LAYANAN
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * 🔗 Relasi ke Layanan
-     */
     public function layanan()
     {
         return $this->belongsTo(Layanan::class);
     }
 
-    /**
-     * 🔗 Relasi ke Keyword
-     */
-    public function keyword()
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI FAQ
+    |--------------------------------------------------------------------------
+    */
+
+    public function faq()
     {
-        return $this->belongsTo(Keyword::class);
+        return $this->belongsTo(Faq::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI ADMIN
+    |--------------------------------------------------------------------------
+    */
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class);
     }
 }

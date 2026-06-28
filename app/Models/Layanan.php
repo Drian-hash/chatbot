@@ -18,6 +18,11 @@ class Layanan extends Model
         return $this->hasMany(Faq::class);
     }
 
+    public function permohonans()
+    {
+        return $this->hasMany(Permohonan::class);
+    }
+
     // // 🔗 Relasi ke Pertanyaan chatbot
     // public function pertanyaan()
     // {

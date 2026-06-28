@@ -1,125 +1,423 @@
 @extends('admin.dashboard')
 
+@section('title', 'Profil')
+
 @section('admin')
-    <div class="page-wrapper">
-        <div class="container-fluid pt-3">
 
-            <!-- Header -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body py-3">
-                            <h4 class="mb-0 fw-bold">My Profile</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <style>
+        .profile-wrapper {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+        }
 
-            <!-- Profile Content -->
-            <div class="row g-4">
+        .profile-card {
 
-                <!-- LEFT SIDE - FOTO -->
-                <div class="col-md-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body text-center py-4">
+            background: #fff;
 
-                            <img src="{{ $admin->foto ? asset('storage/' . $admin->foto) : asset('assets/images/users/profile-pic.jpg') }}"
-                                class="rounded-circle border shadow-sm mb-3" width="170" height="170"
-                                style="object-fit: cover;">
+            border-radius: 24px;
 
-                            <h5 class="fw-bold mb-1">
-                                {{ $admin->name ?? '-' }}
-                            </h5>
+            padding: 30px;
 
-                            <p class="text-muted mb-2">
-                                {{ $admin->email }}
-                            </p>
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, .05);
 
-                            <span class="badge bg-primary px-3 py-2">
-                                Administrator
-                            </span>
+            position: relative;
 
-                        </div>
-                    </div>
-                </div>
+            overflow: hidden;
+        }
 
-                <!-- RIGHT SIDE - FORM EDIT -->
-                <div class="col-md-8">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body px-4 py-4">
+        .profile-cover {
 
-                            @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
+            height: 110px;
 
-                            <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
+            background:
+                linear-gradient(135deg,
+                    #6366f1,
+                    #8b5cf6);
 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="fw-semibold mb-1">Nama</label>
-                                        <input type="text" name="name" class="form-control"
-                                            value="{{ old('name', $admin->name) }}">
-                                    </div>
+            border-radius: 18px;
 
-                                    <div class="col-md-6">
-                                        <label class="fw-semibold mb-1">Username</label>
-                                        <input type="text" class="form-control bg-light" value="{{ $admin->username }}"
-                                            readonly>
-                                    </div>
-                                </div>
+            margin-bottom: 70px;
+        }
 
-                                <div class="mb-3">
-                                    <label class="fw-semibold mb-1">Email</label>
-                                    <input type="email" name="email" class="form-control"
-                                        value="{{ old('email', $admin->email) }}">
-                                </div>
+        .profile-avatar {
 
-                                <div class="mb-4">
-                                    <label class="fw-semibold mb-1">Foto Profil</label>
-                                    <input type="file" name="foto" class="form-control">
-                                </div>
+            width: 120px;
+            height: 120px;
 
-                                <div class="d-flex justify-content-between">
-                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                                        Kembali
-                                    </a>
+            border-radius: 50%;
 
-                                    <button type="submit" class="btn btn-primary px-4">
-                                        Update Profil
-                                    </button>
-                                </div>
+            border: 5px solid #fff;
 
-                            </form>
+            object-fit: cover;
 
-                        </div>
-                    </div>
+            position: absolute;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            top: 55px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, .15);
+
+            background: #fff;
+
+        }
+
+        .profile-name {
+
+            text-align: center;
+            margin-top: -15px;
+        }
+
+        .profile-name h3 {
+
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .profile-name p {
+
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .badge-role {
+
+            display: inline-block;
+
+            padding: 8px 18px;
+
+            border-radius: 30px;
+
+            background:
+                rgba(99, 102, 241, .1);
+
+            color: #6366f1;
+
+            font-size: 13px;
+
+            margin-top: 10px;
+        }
+
+        .profile-stats {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            margin-top: 30px;
+
+            border-top:
+                1px solid #eee;
+
+            padding-top: 25px;
+
+            text-align: center;
+        }
+
+        .profile-stats h4 {
+
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .profile-stats span {
+
+            font-size: 13px;
+            color: #64748b;
+        }
+
+
+        /* RIGHT */
+
+        .edit-card {
+
+            background: #fff;
+
+            padding: 30px;
+
+            border-radius: 24px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, .05);
+
+        }
+
+        .section-title {
+
+            font-size: 20px;
+            font-weight: 600;
+
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-weight: 500;
+        }
+
+        .form-control {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border-radius: 12px;
+
+            border: 1px solid #ddd;
+
+            transition: .3s;
+        }
+
+        .form-control:focus {
+
+            outline: none;
+
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 5px rgba(99, 102, 241, .1);
+
+        }
+
+        .action {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 30px;
+        }
+
+        .btn-back {
+
+            padding: 12px 20px;
+
+            border-radius: 12px;
+
+            border: none;
+
+            background: #f1f5f9;
+
+            cursor: pointer;
+        }
+
+        .btn-save {
+
+            padding: 12px 25px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(135deg,
+                    #6366f1,
+                    #8b5cf6);
+
+            color: white;
+
+            cursor: pointer;
+
+            font-weight: 600;
+        }
+
+        .btn-save:hover {
+
+            opacity: .9;
+        }
+
+
+        /* DARK */
+
+        body.dark .profile-card,
+        body.dark .edit-card {
+
+            background: #020617;
+
+            border:
+                1px solid #1e293b;
+
+        }
+
+        body.dark .form-control {
+
+            background: #0f172a;
+
+            border:
+                1px solid #1e293b;
+
+            color: white;
+
+        }
+
+        body.dark .profile-stats {
+
+            border-color: #1e293b;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media(max-width:900px) {
+
+            .profile-wrapper {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+    </style>
+
+
+
+    <div class="profile-wrapper">
+
+
+        <!-- KIRI -->
+
+        <div class="profile-card">
+
+            <div class="profile-cover"></div>
+
+            <img src="{{ $admin->foto ? asset('storage/' . $admin->foto) : asset('assets/images/users/profile-pic.jpg') }}"
+                class="profile-avatar">
+
+
+            <div class="profile-name">
+
+                <h3>
+
+                    {{ $admin->name }}
+
+                </h3>
+
+                <p>
+
+                    {{ $admin->email }}
+
+                </p>
+
+                <div class="badge-role">
+
+                    Administrator
+
                 </div>
 
             </div>
 
         </div>
+
+
+
+        <!-- KANAN -->
+
+        <div class="edit-card">
+
+            <div class="section-title">
+
+                Edit Profil
+
+            </div>
+
+            <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
+
+                @csrf
+                @method('PUT')
+
+                <div class="form-group">
+
+                    <label>
+
+                        Nama
+
+                    </label>
+
+                    <input type="text" name="name" value="{{ old('name', $admin->name) }}" class="form-control">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Username
+
+                    </label>
+
+                    <input type="text" value="{{ $admin->username }}" readonly class="form-control">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Email
+
+                    </label>
+
+                    <input type="email" name="email" value="{{ old('email', $admin->email) }}" class="form-control">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Foto Profil
+
+                    </label>
+
+                    <input type="file" name="foto" class="form-control">
+
+                </div>
+
+
+                <div class="action">
+
+                    <a href="{{ route('admin.dashboard') }}">
+
+                        <button type="button" class="btn-back">
+
+                            Kembali
+
+                        </button>
+
+                    </a>
+
+                    <button type="submit" class="btn-save">
+
+                        Update Profil
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
     </div>
+
 @endsection
-
-
-@push('scripts')
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '{{ session('success') }}',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        </script>
-    @endif
-@endpush

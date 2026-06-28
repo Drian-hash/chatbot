@@ -10,23 +10,52 @@ use App\Exports\UserExport;
 
 class UserController extends Controller
 {
+    /**
+     * LIST USER
+     */
     public function index(Request $request)
     {
         $query = User::query();
 
-        if ($request->search) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('phone', 'like', '%' . $request->search . '%');
+        /*
+        |--------------------------------------------------------------------------
+        | SEARCH
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+
+            });
+
         }
 
-        $users = $query->latest()->paginate(10);
+        $users = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.user.index', compact('users'));
+        return view(
+            'admin.user.index',
+            compact('users')
+        );
     }
 
-    // 🔥 EXPORT
+    /**
+     * EXPORT EXCEL
+     */
     public function export()
     {
-        return Excel::download(new UserExport, 'data-user.xlsx');
+        return Excel::download(
+            new UserExport,
+            'data-user.xlsx'
+        );
     }
 }
+

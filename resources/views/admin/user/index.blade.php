@@ -1,242 +1,484 @@
 @extends('admin.dashboard')
 
-@section('title', 'Pengguna')
+@section('title', 'Data User')
 
 @section('admin')
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<main class="dashboard-content">
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-        .title {
-            margin-bottom: 18px;
-            font-size: 20px;
-            font-weight: 600;
-        }
+        <div class="page-heading">
 
-        .table-box {
-            background: #fff;
-            padding: 22px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
+            <div class="page-heading-copy">
 
-        .table-header {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 18px;
-        }
+                <div>
+                    <h2 class="h3 mb-1">Data User</h2>
 
-        .right-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* 🔥 EXPORT STYLE (LIKE IMPORT) */
-        .btn-export-outline {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 9px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .btn-export-outline:hover {
-            background: #f9fafb;
-        }
-
-        .btn-export-outline i {
-            font-size: 12px;
-        }
-
-        .right-actions input {
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            width: 200px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f9fafb;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        td,
-        th {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        td {
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .badge {
-            background: #e0f2fe;
-            color: #0284c7;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 18px;
-            font-size: 13px;
-        }
-
-        .pagination-info {
-            color: #6b7280;
-        }
-
-        .pagination-custom {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .pagination-btn {
-            padding: 5px 10px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #555;
-            transition: 0.2s;
-        }
-
-        .pagination-btn:hover {
-            background: #f3f4f6;
-        }
-
-        .pagination-btn.disabled {
-            color: #bbb;
-        }
-
-        .pagination-current {
-            padding: 6px 12px;
-            border-radius: 6px;
-            background: #38bdf8;
-            color: white;
-            font-weight: 500;
-        }
-    </style>
-
-    <h2 class="title">Data Pengguna</h2>
-
-    <div class="table-box">
-
-        <!-- HEADER -->
-        <div class="table-header">
-
-            <div class="right-actions">
-
-                <!-- 🔥 EXPORT -->
-                <a href="{{ route('admin.user.export') }}">
-                    <button class="btn-export-outline">
-                        <i class="fas fa-download"></i>
-                        Export
-                    </button>
-                </a>
-
-                <!-- 🔥 SEARCH -->
-                <form method="GET">
-                    <input type="text" name="search" placeholder="Cari pengguna..." value="{{ request('search') }}">
-                </form>
+                    <p class="text-muted mb-0">
+                        Kelola data pengguna chatbot.
+                    </p>
+                </div>
 
             </div>
 
         </div>
 
-        <!-- TABLE -->
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>No WA</th>
-                    <th>Total Pesan</th>
-                    <th>Pertama Chat</th>
-                </tr>
-            </thead>
+        <section class="panel">
 
-            <tbody>
-                @forelse($users as $item)
-                    <tr>
-                        <td>{{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}</td>
+            <div class="panel-header">
 
-                        <td>{{ $item->name ?? 'User' }}</td>
+                <div>
 
-                        <td>{{ $item->phone }}</td>
+                    <h2 class="h5 mb-1 section-title">
+                        <span>Daftar User</span>
+                    </h2>
 
-                        <td>
-                            <span class="badge">
-                                {{ $item->total_messages }}
-                            </span>
-                        </td>
+                </div>
 
-                        <td>
-                            {{ $item->first_chat_at ? \Carbon\Carbon::parse($item->first_chat_at)->format('d M Y H:i') : '-' }}
-                        </td>
-                    </tr>
+                <div class="d-flex align-items-center gap-2">
 
-                @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center;padding:30px;color:#999;">
-                            Belum ada data pengguna
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    {{-- EXPORT --}}
+                    <a href="{{ route('admin.user.export') }}"
+                       class="btn btn-outline-success btn-sm">
 
-        <!-- PAGINATION -->
-        <div class="pagination-container">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        Export
 
-            <div class="pagination-info">
-                Menampilkan {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }}
-                dari {{ $users->total() }} data
+                    </a>
+
+                    {{-- SEARCH --}}
+                    <form action="{{ route('admin.user.index') }}"
+                          method="GET">
+
+                        <div class="search-box">
+
+                            <input
+                                type="text"
+                                name="search"
+                                placeholder="Cari user..."
+                                value="{{ request('search') }}">
+
+                            <button type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
             </div>
 
-            <div class="pagination-custom">
+            <div class="table-responsive rounded-3 border">
 
-                @if ($users->onFirstPage())
-                    <span class="pagination-btn disabled">&#8249;</span>
-                @else
-                    <a href="{{ $users->previousPageUrl() }}&search={{ request('search') }}"
-                        class="pagination-btn">&#8249;</a>
-                @endif
+                <table class="table align-middle mb-0">
 
-                <span class="pagination-current">
-                    {{ $users->currentPage() }}
-                </span>
+                    <thead style="background: linear-gradient(90deg, #0b3d2e 0%, #146c43 100%);">
 
-                @if ($users->hasMorePages())
-                    <a href="{{ $users->nextPageUrl() }}&search={{ request('search') }}"
-                        class="pagination-btn">&#8250;</a>
-                @else
-                    <span class="pagination-btn disabled">&#8250;</span>
-                @endif
+                        <tr>
 
+                            <th width="70" class="text-white py-3 ps-3" style="font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">No</th>
+                            <th class="text-white py-3" style="font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">Nama User</th>
+                            <th class="text-white py-3" style="font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">No WhatsApp</th>
+                            <th class="text-white py-3" style="font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">Tanggal Daftar</th>
+                            <th width="120" class="text-white py-3 text-end pe-3" style="font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">Aksi</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($users as $item)
+
+                            <tr class="border-bottom">
+
+                                <td class="ps-3 text-secondary" style="font-size: 13.5px;">
+
+                                    {{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}
+
+                                </td>
+
+                                <td style="font-size: 13.5px; color: #1e293b !important; font-weight: 400;">
+
+                                    {{ $item->name }}
+
+                                </td>
+
+                                <td style="font-size: 13.5px; color: #1e293b !important; font-weight: 400;">
+
+                                    {{ $item->phone ?? '-' }}
+
+                                </td>
+
+                                <td style="font-size: 13.5px; color: #1e293b !important; font-weight: 400;">
+
+                                    {{ $item->created_at->format('d M Y H:i') }}
+
+                                </td>
+
+                                <td class="text-end pe-3">
+
+                                    <div class="d-flex justify-content-end align-items-center gap-1 flex-nowrap">
+
+                                        {{-- VIEW BUTTON --}}
+                                        <button type="button" class="btn btn-sm btn-outline-info btn-action-custom"
+                                            data-name="{{ $item->name }}"
+                                            data-phone="{{ $item->phone ?? '-' }}"
+                                            data-date="{{ $item->created_at->format('d F Y H:i') }}"
+                                            title="Detail User">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        {{-- DELETE BUTTON --}}
+                                        <form action="{{ route('admin.user.destroy', $item->id) }}" method="POST" class="delete-form d-inline m-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-action-custom btn-delete"
+                                                data-title="{{ $item->name }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="5"
+                                    class="text-center py-4 text-muted" style="font-size: 13.5px;">
+
+                                    Belum ada data user
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 p-3">
+
+                <div class="text-muted" style="font-size: 13px;">
+                    Menampilkan {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} dari {{ $users->total() }} data user
+                </div>
+
+                <div class="d-flex align-items-center">
+                    @if ($users->onFirstPage())
+                        <span class="px-2 text-muted" style="cursor: default;">&#8249;</span>
+                    @else
+                        <a href="{{ $users->previousPageUrl() }}&search={{ request('search') }}"
+                            class="px-2 text-decoration-none">&#8249;</a>
+                    @endif
+
+                    <span class="px-3 py-1 mx-1 text-white"
+                        style="background-color: #5dd5f9; border-radius: 4px; font-size: 13px;">
+                        {{ $users->currentPage() }}
+                    </span>
+
+                    @if ($users->hasMorePages())
+                        <a href="{{ $users->nextPageUrl() }}&search={{ request('search') }}"
+                            class="px-2 text-decoration-none">&#8250;</a>
+                    @else
+                        <span class="px-2 text-muted" style="cursor: default;">&#8250;</span>
+                    @endif
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<div class="modal fade custom-dynamic-fade" id="modalViewUser" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-custom-top">
+
+        <div class="modal-content custom-modal">
+
+            <div class="modal-header custom-header">
+
+                <h5 class="modal-title">
+                    Detail Pengguna Chatbot
+                </h5>
+
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Nama Pengguna</label>
+                    <div id="viewName" class="p-2 border rounded bg-light text-dark" style="font-size: 13.5px; min-height: 38px;"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">No WhatsApp</label>
+                    <div id="viewPhone" class="p-2 border rounded bg-light text-dark" style="font-size: 13.5px; min-height: 38px;"></div>
+                </div>
+
+                <div>
+                    <label class="form-label fw-semibold text-secondary">Tanggal Terdaftar Sistem</label>
+                    <div id="viewDate" class="p-2 border rounded bg-light text-dark" style="font-size: 13.5px; min-height: 38px;"></div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                    Tutup
+                </button>
             </div>
 
         </div>
 
     </div>
+
+</div>
+
+<style>
+
+/* =========================================
+   SEARCH BOX
+========================================= */
+
+.search-box{
+    display:flex;
+    align-items:center;
+}
+
+.search-box input{
+    width:220px;
+    height:40px;
+
+    padding:0 14px;
+
+    border:1px solid #d9e2ec;
+    border-right:none;
+
+    border-radius:10px 0 0 10px;
+
+    font-size:13px;
+    color: #334155;
+    background: #fff;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.search-box button{
+    width:48px;
+    height:40px;
+
+    border:none;
+
+    background:#2563eb;
+    color:white;
+
+    border-radius:0 10px 10px 0;
+    cursor: pointer;
+}
+
+.search-box button:hover{
+    background:#1d4ed8;
+}
+
+/* =========================================
+   PANEL HEADER
+========================================= */
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+}
+
+.btn-action-custom {
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+}
+.btn-action-custom i {
+    font-size: 13px !important;
+}
+
+/* =========================================
+   MODAL CUSTOM DESIGN & POSITION
+========================================= */
+
+/* ⚡ FIX: Mengecilkan lebar maksimal modal menjadi 400px agar lebih ramping */
+.modal-custom-top {
+    max-width: 400px !important;
+    margin: 6vh auto 1.75rem auto !important;
+}
+
+.custom-modal {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .12), 0 5px 15px rgba(0, 0, 0, .08);
+    transition: transform 0.3s ease-out;
+}
+
+.custom-dynamic-fade .modal-content {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+
+.custom-dynamic-fade.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.custom-header {
+    background: #5f73e6;
+    color: white;
+    border: none;
+    padding: 14px 18px;
+}
+
+.custom-header .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-body .border {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s;
+}
+
+.modal-body .border:hover {
+    border-color: #cbd5e1 !important;
+    background-color: #f1f5f9 !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 12px 20px;
+    background-color: #fafafa;
+}
+
+.btn-cancel {
+    border: none;
+    background: #64748b;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #475569;
+}
+
+@media(max-width:768px){
+    .search-box{
+        width:100%;
+    }
+    .search-box input{
+        width:100%;
+    }
+    .modal-custom-top {
+        max-width: 92% !important;
+        margin: 4vh auto !important;
+    }
+}
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVENT: DETECT & SHOW MODAL DETAIL USER
+        |--------------------------------------------------------------------------
+        */
+        const viewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalViewUser'));
+
+        document.querySelectorAll('.btn-outline-info').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('viewName').innerText = this.dataset.name;
+                document.getElementById('viewPhone').innerText = this.dataset.phone;
+                document.getElementById('viewDate').innerText = this.dataset.date;
+                viewModal.show();
+            });
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVENT: DETECT & CONFIRM DELETE USER VIA SWEETALERT2
+        |--------------------------------------------------------------------------
+        */
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function() {
+                const formDelete = this.closest('form');
+                const userName = this.dataset.title;
+
+                Swal.fire({
+                    title: 'Hapus User?',
+                    text: 'Pengguna "' + userName + '" akan dihapus permanen dari sistem.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        formDelete.submit();
+                    }
+                });
+            });
+        });
+
+    });
+</script>
 
 @endsection

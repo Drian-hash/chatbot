@@ -42,4 +42,9 @@ class Admin extends Authenticatable
 
         return asset('images/default-user.png');
     }
+
+    public function permohonans()
+    {
+        return $this->hasMany(Permohonan::class);
+    }
 }

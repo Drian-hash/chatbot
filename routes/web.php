@@ -9,17 +9,21 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\KeywordController;
 use App\Http\Controllers\Admin\ChatLogController;
 use App\Http\Controllers\Admin\ChatbotController;
+use App\Http\Controllers\Admin\PermohonanController;
 use App\Http\Controllers\Admin\ProfileController;
 
+// Webhook WhatsApp (NLP Bot)
 Route::post('/webhook/wa', [ChatbotController::class, 'webhook']);
 
+// Root Redirect
 Route::get('/', function () {
     return redirect()->route('admin.login');
 });
 
+// Admin Panel Routes
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Login
+    // Authentication
     Route::get('login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.submit');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -30,27 +34,40 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // profile
+        // Profile Admin
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
         Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
 
-        // User
-        Route::resource('user', UserController::class)->names('user');
-        Route::get('user/export', [UserController::class, 'export'])->name('user.export');
-
-        //Pelayanan
+        /* =====================================
+           1. MASTER DATA
+        ===================================== */
+        // Layanan
         Route::resource('layanan', LayananController::class)->names('layanan');
 
-        //Faq
-        Route::resource('faq', FaqController::class);
+        // FAQ
+        Route::resource('faq', FaqController::class)->names('faq');
         Route::post('faq/import', [FaqController::class, 'import'])->name('faq.import');
 
-        //keyword
+        // Keyword (Sistem NLP Pembantu)
         Route::resource('keyword', KeywordController::class)->names('keyword');
 
-        //chatlog
-        Route::resource('chatlog', ChatLogController::class)->names('chatlog');
 
+        /* =====================================
+           2. LAYANAN PUBLIK
+        ===================================== */
+        // Permohonan (Dipastikan menggunakan PermohonanController)
+        Route::resource('permohonan', PermohonanController::class)->names('permohonan');
+
+        // Percakapan (Menggantikan URL chatlog)
+        Route::resource('percakapan', ChatLogController::class)->names('chatlog');
+
+
+        /* =====================================
+           3. MONITORING
+        ===================================== */
+        // Pengguna (Menggantikan URL user)
+        Route::get('pengguna/export', [UserController::class, 'export'])->name('user.export');
+        Route::resource('pengguna', UserController::class)->names('user');
 
     });
 });

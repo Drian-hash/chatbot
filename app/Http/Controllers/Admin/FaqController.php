@@ -7,45 +7,61 @@ use App\Models\Faq;
 use App\Models\Layanan;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\FaqImport;
+use App\Imports\FaqImport; // Menggunakan satu-satunya library import pilihan Anda
 
 class FaqController extends Controller
 {
+    /**
+     * =====================================================
+     * 📋 TAMPILAN UTAMA & PENCARIAN DATA FAQ
+     * =====================================================
+     */
     public function index(Request $request)
     {
         $query = Faq::with('layanan');
 
-        // 🔍 SEARCH
+        // Fitur Pencarian Data
         if ($request->search) {
             $query->where('pertanyaan', 'like', '%' . $request->search . '%');
         }
 
-        $faq = $query->orderBy('id', 'asc')->paginate(10);
+        // Ambil jumlah data per halaman (default: 10 entries)
+        $perPage = $request->get('per_page', 10);
+
+        $faq = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
         $layanan = Layanan::all();
 
         return view('admin.faq.index', compact('faq', 'layanan'));
     }
 
-    // ➕ STORE
+    /**
+     * =====================================================
+     * ➕ SIMPAN DATA FAQ BARU (MANUAL)
+     * =====================================================
+     */
     public function store(Request $request)
     {
         $request->validate([
             'layanan_id' => 'required|exists:layanan,id',
             'pertanyaan' => 'required|string',
-            'jawaban' => 'required|string'
+            'jawaban'    => 'required|string'
         ]);
 
         Faq::create([
             'layanan_id' => $request->layanan_id,
             'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban,
+            'jawaban'    => $request->jawaban,
         ]);
 
         return redirect()->route('admin.faq.index')
             ->with('success', 'FAQ berhasil ditambahkan');
     }
 
-    // ✏️ UPDATE
+    /**
+     * =====================================================
+     * ✏️ UPDATE / PERBARUI DATA FAQ
+     * =====================================================
+     */
     public function update(Request $request, $id)
     {
         $faq = Faq::findOrFail($id);
@@ -53,20 +69,24 @@ class FaqController extends Controller
         $request->validate([
             'layanan_id' => 'required|exists:layanan,id',
             'pertanyaan' => 'required|string',
-            'jawaban' => 'required|string'
+            'jawaban'    => 'required|string'
         ]);
 
         $faq->update([
             'layanan_id' => $request->layanan_id,
             'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban,
+            'jawaban'    => $request->jawaban,
         ]);
 
         return redirect()->route('admin.faq.index')
             ->with('success', 'FAQ berhasil diupdate');
     }
 
-    // 🗑️ DELETE
+    /**
+     * =====================================================
+     * 🗑️ HAPUS PERMANEN DATA FAQ
+     * =====================================================
+     */
     public function destroy($id)
     {
         $faq = Faq::findOrFail($id);
@@ -76,34 +96,28 @@ class FaqController extends Controller
             ->with('success', 'FAQ berhasil dihapus');
     }
 
-    // 📥 IMPORT
+    /**
+     * =====================================================
+     * 📥 DIRECT DATA IMPORT: EXCEL & CSV MANIFEST
+     * =====================================================
+     */
     public function import(Request $request)
     {
+        // Validasi ekstensi file hanya menerima format Excel dan CSV saja (Maksimal 4MB)
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv,pdf|max:2048'
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:4096'
         ]);
 
-        $file = $request->file('file');
-        $extension = strtolower($file->getClientOriginalExtension());
-
-        // 🔥 EXCEL / CSV
-        if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
-
-            Excel::import(new FaqImport, $file);
+        try {
+            // Mengeksekusi file import langsung menggunakan class FaqImport pilihan Anda
+            Excel::import(new FaqImport, $request->file('file'));
 
             return redirect()->route('admin.faq.index')
-                ->with('success', 'Data FAQ berhasil diimport dari Excel');
+                ->with('success', 'Seluruh data berkas FAQ berhasil diimport dari berkas Excel/CSV ke dalam sistem.');
+
+        } catch (\Exception $e) {
+            // Mengamankan crash database apabila struktur kolom di Excel admin tidak sesuai template
+            return redirect()->back()->with('error', 'Gagal memproses berkas Excel. Pastikan format tabel dan data layanan_id Anda sudah sesuai.');
         }
-
-        // 🔥 PDF (UPLOAD SAJA)
-        if ($extension === 'pdf') {
-
-            $file->store('uploads/pdf');
-
-            return redirect()->route('admin.faq.index')
-                ->with('success', 'File PDF berhasil diupload (belum diproses)');
-        }
-
-        return redirect()->back()->with('error', 'Format file tidak didukung');
     }
 }
